@@ -3,6 +3,8 @@ import Inner from './blocks/Inner'
 import Ingredients from './ingredients/index'
 import CoffeMaschine from './coffeMaschine/index'
 import Recipe from './recipe/index'
+import React from 'react';
+import { sound } from '../constants/index'
 
 const Main = styled.div`
     display:flex;
@@ -11,12 +13,31 @@ const Main = styled.div`
 `;
 
 function App() {
+
+  const [ingCollection, setIngCollection] = React.useState([[],[],[]]);    
+  let ingredientClick = new Audio(sound.ingredientClick);
+
+  function addIngredientHandle({target}) {
+
+    const ingName = target.id;
+    const cups = document.querySelectorAll('.cup');
+    const dataActive = [];
+
+    cups.forEach((el)=> { dataActive.push(el.dataset.active);})
+    const ingIdx = dataActive.indexOf('true');
+    if(ingCollection[ingIdx].length > 1) {return;}
+    ingredientClick.play();
+    ingCollection[ingIdx].push(ingName);
+
+    setIngCollection([].concat(ingCollection));
+  }
+
   return (
     <Main>
       <Inner justifyContent='center' maxWidth='500px'>
         <Recipe/>
-        <CoffeMaschine/>
-        <Ingredients/>
+        <CoffeMaschine ingCollection={ingCollection} />
+        <Ingredients addIngredient = {() => addIngredientHandle}/>
       </Inner>
     </Main>
   );

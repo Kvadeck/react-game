@@ -17,6 +17,18 @@ import sugarOrder from '../assets/recipe/orderIngredients/sugarOrder.png'
 import Cup from '../assets/expresso/cup/Cup.png';
 import CupSelected from '../assets/expresso/cup/CupSelected.png';
 
+import chocolateIngredient from '../assets/cupIngredients/chocolateCupIngredient.png'
+import cinnamonIngredient from '../assets/cupIngredients/cinnamonCupIngredient.png'
+import coffeeIngredient from '../assets/cupIngredients/coffeeCupIngredient.png'
+import creamIngredient from '../assets/cupIngredients/creamCupIngredient.png'
+import sugarIngredient from '../assets/cupIngredients/sugarCupIngredient.png'
+
+import ServeEnabledBtn from '../assets/expresso/buttons/serveEnabled.png';
+import ServeDisabledBtn from '../assets/expresso/buttons/serveDisabled.png';
+import StartServeBtn from '../assets/expresso/buttons/startServe.png';
+import SucessBtn from '../assets/expresso/buttons/serveSuccess.png';
+import FailBtn from '../assets/expresso/buttons/orderFail.png';
+
 export const recipe = {
     'chocolate' : chocolateOrder,
     'cinnamon' : cinnamonOrder,
@@ -38,4 +50,33 @@ export const cups = {
     'normal' : Cup,
 }
 
+export const cupIngredients = {
+    'chocolate' : chocolateIngredient,
+    'cinnamon' : cinnamonIngredient,
+    'coffee' : coffeeIngredient,
+    'cream' : creamIngredient,
+    'sugar' : sugarIngredient,
+}
 
+export const IngredientCustoms = [
+    {id:'cinnamon', src: ingredients['cinnamon'], width:'45px', top:'35px', height:'54px'},
+    {id:'cream', src: ingredients['milk'], width:'45px', top:'27px', height:'61px'},
+    {id:'chocolate', src: ingredients['chocolate'], width:'50px', top:'45px', height:'41px'},
+    {id:'sugar', src: ingredients['sugar'], width:'50px', top:'34px', height:'53px'},
+    {id:'coffee', src: ingredients['coffee'], width:'50px', top:'41px', height:'39px'},
+]
+
+export const sound = {
+    selectcup: '/sound/cupMove.mp3',
+    ingredientClick: '/sound/ingredientClick.mp3',
+    coffeeStop: '/sound/coffeeStop.mp3'
+}
+
+
+export const coffeeButtons = {
+    'enabled' : ServeEnabledBtn,
+    'disabled' : ServeDisabledBtn,
+    'start' : StartServeBtn,
+    'sucess' : SucessBtn,
+    'fail' : FailBtn,
+}
