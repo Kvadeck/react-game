@@ -2,10 +2,9 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import React from 'react';
 
-import ServeEnabledBtn from '../../assets/expresso/buttons/serveEnabled.png';
 import Handle from '../../assets/expresso/handle/handle.png';
 
-import {cups} from '../../constants/index'
+import {cups, sound, cupIngredients, coffeeButtons} from '../../constants/index'
 
 const CoffeMaschineWrapper = styled.div`
     display: flex;
@@ -83,9 +82,13 @@ const CupsInner = styled.div`
    margin: 0 12px;
 `;
 const CupsItem = styled.div`
+    display: flex;
+    flex-direction: column;
     position: relative;
+    align-items: center;
+    justify-content: center;
     width: 92px;
-    height: 108px;
+    height: 120px;
     cursor: pointer;
     z-index: 4;
     background-image: url(${cups.normal});
@@ -94,36 +97,104 @@ const CupsItem = styled.div`
         top: 6px;
     `};
 `;
+const IngredientInner = styled.div`
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 4;
+`;
+const IngredientCup = styled.img`
+    width: 50px;
+    height: 50px;
+`;
 
-function CoffeMaschine() {
-    let audio = new Audio("/sound/cupMove.mp3");
-    const [cups, setCups] = React.useState([false, true, false]);
+// TODO: Если хоть один ингредиент есть в стакане и было переключение на другой стакан. То у этого стакана доступно только удаление.
 
-    function handleClickCups({target}) {
-        const pureCups = new Array(3).fill(false);
-        pureCups[target.id] = true;
-        audio.play();
-        setCups(pureCups.slice());
+function CoffeMaschine({ingCollection}) {
+
+    const [cups, setCups] = React.useState([true, false, false]);
+    const [buttons, setButtons] = React.useState([false, false, false]);
+
+    const [ingCupCollection, setIngCupCollection] = React.useState([[],[],[]]); 
+
+    let selectcup = new Audio(sound.selectcup);
+    let coffeeStop = new Audio(sound.coffeeStop);
+
+    function setActiveButtons() {
+        const buttonsActive = [];
+        ingCollection.forEach((arr, i)=> {
+            if (Array.isArray(arr) && arr.length) { 
+                buttonsActive.push(true)
+            } else {
+                buttonsActive.push(false)
+            }
+        })
+        return buttonsActive;
     }
 
+    React.useEffect(() => {
+
+        setButtons([].concat(setActiveButtons()))
+        setIngCupCollection(ingCollection);
+
+      },[ingCollection])
+
+    function handleClickCups({target}) {
+        const index = target.dataset.index;
+        if (cups[index] !== true) { selectcup.play();}
+        (function () {
+            const pureCups = new Array(3).fill(false);
+            pureCups[index] = true;
+            setCups(pureCups.slice());
+        })();
+    }
+
+    function removeIngredientsFrmCup(e) {
+        e.stopPropagation();
+        coffeeStop.play();
+        const cupIdx = e.currentTarget.parentNode.dataset.index;
+        while(ingCupCollection[cupIdx].length > 0) {
+            ingCupCollection[cupIdx].pop();
+        }
+        setIngCupCollection([].concat(ingCupCollection));
+        setButtons([].concat(setActiveButtons()))
+    }
+ 
     const CupsList = cups.map((el, i) =>
     (
         <CupsItem
-            id={i}
+            className='cup'
+            data-index={i}
+            data-active={el}
             key={i.toString()}
             selected={(el) ? true: false}
             onClick= {(e) => handleClickCups(e)}
-        />
+        >
+            <IngredientInner onClick= {(e) => removeIngredientsFrmCup(e)}>
+                {ingCupCollection[i].map((val, j) => {
+                    return (
+                        <IngredientCup key={j.toString()} src={cupIngredients[val]}/>
+                    );
+                })}
+            </IngredientInner>
+            
+        </CupsItem>
+    ))
+
+    const ButtonsList = buttons.map((el, i) => (
+        <CoffeMaschineButton key={i.toString()} buttonIcon={(el) ? coffeeButtons.start: coffeeButtons.enabled} />
     ))
 
     return (
 
         <CoffeMaschineWrapper>
-            <CoffeMaschineOuter> 
+            <CoffeMaschineOuter>
+
                 <CoffeMaschineButtonsInner>
-                    <CoffeMaschineButton buttonIcon={ServeEnabledBtn} />
-                    <CoffeMaschineButton buttonIcon={ServeEnabledBtn} />
-                    <CoffeMaschineButton buttonIcon={ServeEnabledBtn} />
+                    {ButtonsList}
                 </CoffeMaschineButtonsInner>
                 
                 <CoffeMaschineCupsInner>
@@ -139,9 +210,8 @@ function CoffeMaschine() {
     );
 }
 
-// Inner.propTypes = {
-//     justifyContent: PropTypes.string,
-//     maxWidth: PropTypes.string
-// }
+CoffeMaschine.propTypes = {
+    ingCollection: PropTypes.array,
+}
 
 export default CoffeMaschine;

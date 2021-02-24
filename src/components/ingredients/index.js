@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
-import JarImg from '../../assets/ingredients/JarEmpty.png';
-import {ingredients} from '../../constants/index'
+import JarEmpty from '../../assets/ingredients/JarEmpty.png';
+import { IngredientCustoms } from '../../constants/index'
 
 const IngredientsWrapper = styled.div`
     display: flex;
@@ -23,56 +23,51 @@ const JarWrapper = styled.div`
     min-height: 100px;
     background-color: var(--background-jar-color);
 `;
-const Jar = styled.div`
+const EmptyJar = styled.div`
     display: flex;
     justify-content: center;
     position: relative;
-    width: 100%;
-    align-items: center;
+    width: 91px;
+    height: 105px;
+    background-image: url(${JarEmpty});
+`;
+const IngredientImage = styled.img`
+    width: ${({ iconWidth }) => iconWidth || "50px"};
+    top: ${({ iconTop }) => iconTop || "45px"};
+    height: ${({ iconHeight }) => iconHeight || "41px"};
+    position: absolute;
     cursor: pointer;
-    &:before {
-        content:'';
-        background-image: url(${({ ingredientIcon }) => ingredientIcon || "none"});
-        width: ${({ iconWidth }) => iconWidth || "50px"};
-        top: ${({ iconTop }) => iconTop || "45px"};
-        height: ${({ iconHeight }) => iconHeight || "41px"};
-        position: absolute;
-    }
 `;
 
-const JarImage = styled.img`
-    width: auto;
-`;
+function Ingredients({ addIngredient }) {
 
-function Ingredients() {
+    const IngredientList = IngredientCustoms.map((el, i) =>
+    (
+        <EmptyJar key={i.toString()}>
+            <IngredientImage
+                id={el.id}
+                src={el.src}
+                key={i.toString()}
+                onClick={addIngredient()}
+                iconWidth={el.width}
+                iconTop={el.top}
+                iconHeight={el.height}
+            />
+        </EmptyJar>
+    ))
+
     return (
-
         <IngredientsWrapper>
             <JarWrapper>
-                <Jar ingredientIcon={ingredients['cinnamon']} iconWidth={'45px'} iconTop={'35px'} iconHeight={'54px'}>
-                    <JarImage src={JarImg} />
-                </Jar>
-                <Jar ingredientIcon={ingredients['milk']} iconWidth={'50px'} iconTop={'27px'} iconHeight={'61px'}>
-                    <JarImage src={JarImg} />
-                </Jar>
-                <Jar ingredientIcon={ingredients['chocolate']} iconWidth={'50px'} iconTop={'45px'} iconHeight={'41px'}>
-                    <JarImage src={JarImg} />
-                </Jar>
-                <Jar ingredientIcon={ingredients['sugar']} iconWidth={'50px'} iconTop={'34px'} iconHeight={'53px'}>
-                    <JarImage src={JarImg} />
-                </Jar>
-                <Jar ingredientIcon={ingredients['coffee']} iconWidth={'50px'} iconTop={'41px'} iconHeight={'39px'}>
-                    <JarImage src={JarImg} />
-                </Jar>
+                {IngredientList}
             </JarWrapper>
         </IngredientsWrapper>
 
     );
 }
 
-// Inner.propTypes = {
-//     justifyContent: PropTypes.string,
-//     maxWidth: PropTypes.string
-// }
+Ingredients.propTypes = {
+    getIngredientName: PropTypes.func,
+}
 
 export default Ingredients;
