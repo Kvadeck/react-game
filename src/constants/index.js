@@ -1,6 +1,3 @@
-// TIMER
-// SCORE
-
 import Chocolate from '../assets/ingredients/jarIngredients/ChocolateIcon.png';
 import Cinnamon from '../assets/ingredients/jarIngredients/CinnamonIcon.png';
 import Coffee from '../assets/ingredients/jarIngredients/Coffee.png';
@@ -28,6 +25,11 @@ import ServeDisabledBtn from '../assets/expresso/buttons/serveDisabled.png';
 import StartServeBtn from '../assets/expresso/buttons/startServe.png';
 import SucessBtn from '../assets/expresso/buttons/serveSuccess.png';
 import FailBtn from '../assets/expresso/buttons/orderFail.png';
+
+// TIMER
+// SCORE
+
+export const cookingTimer = 10000;
 
 export const recipe = {
     'chocolate' : chocolateOrder,
@@ -69,7 +71,9 @@ export const IngredientCustoms = [
 export const sound = {
     selectcup: '/sound/cupMove.mp3',
     ingredientClick: '/sound/ingredientClick.mp3',
-    coffeeStop: '/sound/coffeeStop.mp3'
+    coffeeStop: '/sound/coffeeStop.mp3',
+    coffeeStart: '/sound/coffeeStart.mp3',
+    answerCorrect: '/sound/answerCorrect.mp3'
 }
 
 

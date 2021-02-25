@@ -25,10 +25,16 @@ function App() {
 
     cups.forEach((el)=> { dataActive.push(el.dataset.active);})
     const ingIdx = dataActive.indexOf('true');
-    if(ingCollection[ingIdx].length > 1) {return;}
-    ingredientClick.play();
-    ingCollection[ingIdx].push(ingName);
 
+    const isCooking = cups[ingIdx].dataset.cooking;
+
+    if (ingCollection[ingIdx].length > 1 || isCooking === 'true') {
+      return;
+    } else {
+      ingCollection[ingIdx].push(ingName);
+    }
+
+    ingredientClick.play();
     setIngCollection([].concat(ingCollection));
   }
 

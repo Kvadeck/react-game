@@ -56,5 +56,21 @@ export const GlobalStyle = createGlobalStyle`
   ul {
     list-style-type: none;
   }
-  
+
+  @keyframes right {
+    0% {
+      -webkit-transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(180deg);
+    }
+  }
+  @keyframes left { 
+    0% {
+      -webkit-transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(180deg);
+    }
+  }
 `
