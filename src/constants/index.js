@@ -29,8 +29,6 @@ import FailBtn from '../assets/expresso/buttons/orderFail.png';
 // TIMER
 // SCORE
 
-export const cookingTimer = 10000;
-
 export const recipe = {
     'chocolate' : chocolateOrder,
     'cinnamon' : cinnamonOrder,
@@ -73,7 +71,8 @@ export const sound = {
     ingredientClick: '/sound/ingredientClick.mp3',
     coffeeStop: '/sound/coffeeStop.mp3',
     coffeeStart: '/sound/coffeeStart.mp3',
-    answerCorrect: '/sound/answerCorrect.mp3'
+    answerCorrect: '/sound/answerCorrect.mp3',
+    coffeeBrew: '/sound/coffeeBrew.mp3'
 }
 
 

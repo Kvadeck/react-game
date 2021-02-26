@@ -5,7 +5,7 @@ import CoffeMaschine from './coffeMaschine/index'
 import Recipe from './recipe/index'
 import React from 'react';
 import { sound } from '../constants/index'
-
+import { getAllElementsWithAttribute, findActiveCup } from './helpers/index'
 const Main = styled.div`
     display:flex;
     justify-content:center;
@@ -20,18 +20,15 @@ function App() {
   function addIngredientHandle({target}) {
 
     const ingName = target.id;
-    const cups = document.querySelectorAll('.cup');
-    const dataActive = [];
+    
+    const cupsActive = getAllElementsWithAttribute('data-active');
+    const activeCupIdx = findActiveCup(cupsActive);
+    const isCooking = cupsActive[activeCupIdx].dataset.cooking;
 
-    cups.forEach((el)=> { dataActive.push(el.dataset.active);})
-    const ingIdx = dataActive.indexOf('true');
-
-    const isCooking = cups[ingIdx].dataset.cooking;
-
-    if (ingCollection[ingIdx].length > 1 || isCooking === 'true') {
+    if (ingCollection[activeCupIdx].length > 1 || isCooking === 'ready' || isCooking === 'done') {
       return;
     } else {
-      ingCollection[ingIdx].push(ingName);
+      ingCollection[activeCupIdx].push(ingName);
     }
 
     ingredientClick.play();
