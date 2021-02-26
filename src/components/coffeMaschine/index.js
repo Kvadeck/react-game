@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import React from 'react';
-import { rmFrmIngCupCollection, buttonIconSwitcher } from '../helpers/index'
+import { clearArray, buttonIconSwitcher, getAllElementsWithAttribute, coffeeBrew } from '../helpers/index'
 import Handle from '../../assets/expresso/handle/handle.png';
-import { cups, sound, cupIngredients, cookingTimer } from '../../constants/index'
+import { cups, sound, cupIngredients } from '../../constants/index'
 import Timer from '../timer/index'
 
 const CoffeMaschineWrapper = styled.div`
@@ -111,7 +111,7 @@ const IngredientCup = styled.img`
     height: 50px;
 `;
 
-// TODO: Если хоть один ингредиент есть в стакане и было переключение на другой стакан. То у этого стакана доступно только удаление.
+const brewSounds = new Array(3).fill(null);
 
 function CoffeMaschine({ ingCollection }) {
 
@@ -119,6 +119,7 @@ function CoffeMaschine({ ingCollection }) {
     const [buttons, setButtons] = React.useState(['disabled', 'disabled', 'disabled']);
     const [timer, setTimer] = React.useState(['none', 'none', 'none']);
     const [scoreClick, setScoreClick] = React.useState([false, false, false]);
+    const [cooking, setCooking] = React.useState(['start', 'start', 'start']);
 
     const [ingCupCollection, setIngCupCollection] = React.useState([[], [], []]);
 
@@ -132,7 +133,7 @@ function CoffeMaschine({ ingCollection }) {
         const sucessIdx = [];
 
         buttons.forEach((el, i) => {
-            if (el === 'sucess') { sucessIdx.push(i) }
+            if (el === 'sucess') { sucessIdx.push(i); }
         })
 
         ingCupCollection.forEach((arr, i) => {
@@ -142,21 +143,17 @@ function CoffeMaschine({ ingCollection }) {
                 buttonsActive.push('disabled');
             }
         });
-        if (sucessIdx.length) {
-            sucessIdx.forEach((idx) => {
-                buttonsActive[idx] = 'sucess';
-            })
-        }
+
+        ((sucessIdx.length) ? sucessIdx : []).forEach((idx) => {
+            buttonsActive[idx] = 'sucess';
+        })
 
         return buttonsActive;
     }, [ingCupCollection])
 
-
     React.useEffect(() => {
-
         setButtons([].concat(setActiveButtons()))
         setIngCupCollection(ingCollection);
-
     }, [ingCollection, setActiveButtons])
 
     function handleClickCups({ target }) {
@@ -171,58 +168,85 @@ function CoffeMaschine({ ingCollection }) {
 
     function makeCoffee({ target }) {
         const buttonIdx = target.dataset.index;
+
         buttons[buttonIdx] = 'sucess';
         coffeeStart.play();
 
-        const cups = document.querySelectorAll('.cup');
-        cups[buttonIdx].dataset.cooking = true;
+        const audioBrew = coffeeBrew(buttonIdx);
+        brewSounds[buttonIdx] = audioBrew;
+        audioBrew.play();
+
+        cooking[buttonIdx] = 'ready';
+        setCooking([].concat(cooking))
+
         timer[buttonIdx] = 'block'
-       
-        setButtons([].concat(buttons))
-        setIngCupCollection([].concat(ingCupCollection));
-        setTimer([].concat(timer));
-       
+
         scoreClick[buttonIdx] = true;
         setScoreClick([].concat(scoreClick));
 
+        setButtons([].concat(buttons))
+        setIngCupCollection([].concat(ingCupCollection));
+        setTimer([].concat(timer));
     }
 
     function scoreHandle(e) {
         e.stopPropagation();
-        answerCorrect.play();
-        console.log('Coffee is done');
-        // TODO: Сбросить в исходное состояние этот стакан
-        // TODO: Поставить state из другова компонента по принадлежности в исходное состояние 
+
+        const buttonIdx = e.target.closest('span').dataset.index;
+        const cookingActive = getAllElementsWithAttribute('data-cooking');
+        let isDone = cookingActive[buttonIdx].dataset.cooking;
+
+        if (isDone === 'done') {
+            answerCorrect.play();
+            scoreClick[buttonIdx] = false;
+            setScoreClick([].concat(scoreClick));
+
+            resetCup(buttonIdx);
+            isDone = 'start';
+            console.log('Done! Add to score');
+        }
+
     }
 
-    function removeIngredientsFrmCup(e) {
+    function resetCup(idx) {
+        clearArray(ingCupCollection, idx);
+        setIngCupCollection([].concat(ingCupCollection));
+
+        cooking[idx] = 'start';
+        setCooking([].concat(cooking))
+
+        buttons[idx] = 'disabled';
+        setButtons([].concat(buttons));
+
+        timer[idx] = 'none';
+        setTimer([].concat(timer));
+    }
+
+    function removeCupIngredients(e) {
         e.stopPropagation();
         coffeeStop.play();
         const cupIdx = e.currentTarget.parentNode.dataset.index;
 
-        const cups = document.querySelectorAll('.cup');
-        cups[cupIdx].dataset.cooking = false; 
+        if (brewSounds[cupIdx]) {
+            brewSounds[cupIdx].pause();
+            brewSounds[cupIdx].currentTime = 0.0;
+            brewSounds[cupIdx] = false;
+        }
 
-        rmFrmIngCupCollection(ingCupCollection, cupIdx);
-        setIngCupCollection([].concat(ingCupCollection));
-        buttons[cupIdx] = 'disabled';
-        setButtons([].concat(buttons));
-
-        timer[cupIdx] = 'none';
-        setTimer([].concat(timer));
+        resetCup(cupIdx)
     }
 
     const CupsList = cups.map((el, i) =>
     (
         <CupsItem
-            className='cup'
             data-index={i}
             data-active={el}
+            data-cooking={cooking[i]}
             key={i.toString()}
             selected={(el) ? true : false}
             onClick={(e) => handleClickCups(e)}
         >
-            <IngredientInner onClick={(e) => removeIngredientsFrmCup(e)}>
+            <IngredientInner onClick={(e) => removeCupIngredients(e)}>
                 {ingCupCollection[i].map((val, j) => {
                     return (
                         <IngredientCup key={j.toString()} src={cupIngredients[val]} />
@@ -239,10 +263,11 @@ function CoffeMaschine({ ingCollection }) {
             data-index={i}
             onClick={(el === 'start') ? (e) => makeCoffee(e) : () => () => ''}
             key={i.toString()}
-            buttonIcon={buttonIconSwitcher(el)}>
-                
-                <Timer score = {(scoreClick[i]) ? () => scoreHandle : () => () => ''} show = {timer[i]}/>
-                
+            buttonIcon={buttonIconSwitcher(el)}
+        >
+
+            <Timer score={(scoreClick[i]) ? () => scoreHandle : () => () => ''} show={timer[i]} />
+
         </CoffeMaschineButton>
     ))
 

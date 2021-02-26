@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import React from 'react';
+import { getAllElementsWithAttribute, findActiveCooking } from '../helpers/index'
 
 const LoadingWrapper = styled.div`
   width: 60px;
@@ -37,17 +38,24 @@ const Fill = styled.div`
 
     ${({ left }) => left && `
         z-index: 1;
-        animation: left 5s linear both;
+        animation: left 2.8s linear both;
     `};
     
     ${({ right }) => right && `
         z-index: 3;
-        animation: right 5s linear both;
-        animation-delay: 5s;
+        animation: right 2.8s linear both;
+        animation-delay: 2.8s;
     `};
 `;
 
 function Timer({show, score}) {
+
+    function setCookingDone() {
+        const cookingActive = getAllElementsWithAttribute('data-cooking');
+        const cookingIdx = findActiveCooking(cookingActive, 'ready');
+        cookingActive[cookingIdx].dataset.cooking = 'done';
+        setEndOfAnimation(true);
+    }
 
     const [endOfAnimation, setEndOfAnimation] = React.useState(false);
 
@@ -56,7 +64,7 @@ function Timer({show, score}) {
             <Hold left={true}>
                 <Fill left={true}/>
             </Hold>
-            <Hold onAnimationEnd={() => setEndOfAnimation(true)} right={true}>
+            <Hold onAnimationEnd={() => setCookingDone()} right={true}>
                 <Fill right={true}/>
             </Hold>
         </LoadingWrapper>
