@@ -23,9 +23,11 @@ function App() {
     
     const cupsActive = getAllElementsWithAttribute('data-active');
     const activeCupIdx = findActiveCup(cupsActive);
+
     const isCooking = cupsActive[activeCupIdx].dataset.cooking;
 
-    if (ingCollection[activeCupIdx].length > 1 || isCooking === 'ready' || isCooking === 'done') {
+    if (ingCollection[activeCupIdx].length > 1 
+      || isCooking === 'ready' || isCooking === 'done' || isCooking === 'fail') {
       return;
     } else {
       ingCollection[activeCupIdx].push(ingName);

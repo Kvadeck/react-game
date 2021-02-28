@@ -2,7 +2,8 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import BarEnd from '../../assets/recipe/barEnds.png';
 import RecipeBack from '../../assets/recipe/orderReceipt.png'
-import {recipe} from '../../constants/index'
+import { recipe } from '../../constants/index'
+import React from 'react';
 
 const RecipeWrapper = styled.div`
     display: flex;
@@ -54,7 +55,7 @@ const Curtain = styled.div`
 
 const RecipeCardWrapper = styled.div`
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     position: relative;
     align-items: center;
     width: 100%;
@@ -68,6 +69,7 @@ const RecipeCard = styled.div`
     align-items: center;
     width: 105px;
     height: 111px;
+    margin: 0 5px;
     margin-top: -30px;
     background-image: url(${RecipeBack});
 `;
@@ -76,30 +78,40 @@ const OrderImage = styled.img`
     cursor: pointer;
 `;
 
-
 function Recipe() {
+
+    // TODO: С каждой новой игрой возвращать случайный набор элементов в массиве. 
+
+    // TODO: Принимать массив из Coffee Machine. Проходить этим массивом по рецептам и им же их фильтровать. Далее после фильтрации проходить ещё раз. Если массив пустой после фильтрации то добалять его к измененному стэйту, если же нет то оставлять исходный массив.
+
+    const [recepts, setRecepts] = React.useState([
+        { 0: ['chocolate', 'chocolate'] },
+        { 1: ['cinnamon'] },
+        { 2: ['creamer', 'creamer'] },
+        { 3: ['creamer', 'creamer'] },
+    ]);
+
+    const RecipeList = recepts.map((el, i) =>
+    (
+        <RecipeCard key={i.toString()}>
+            {el[i].map((val, j) => {
+                return (
+                    <OrderImage
+                        key={j.toString()}
+                        src={recipe[val]}
+                    />
+                );
+            })}
+        </RecipeCard>
+    ));
+
     return (
 
         <RecipeWrapper>
             <Curtain />
-
             <RecipeCardWrapper>
-                <RecipeCard>
-                    <OrderImage src={recipe['chocolate']}/>
-                    <OrderImage src={recipe['chocolate']}/>
-                </RecipeCard>
-                <RecipeCard>
-                    <OrderImage src={recipe['cinnamon']}/>
-                </RecipeCard>
-                <RecipeCard> 
-                    <OrderImage src={recipe['creamer']}/>
-                    <OrderImage src={recipe['creamer']}/>
-                </RecipeCard>
-                <RecipeCard>
-                    <OrderImage src={recipe['sugar']}/>
-                </RecipeCard>
+                {RecipeList}
             </RecipeCardWrapper>
-
         </RecipeWrapper>
 
     );
