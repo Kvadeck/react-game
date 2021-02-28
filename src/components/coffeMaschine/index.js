@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import React from 'react';
-import { clearArray, buttonIconSwitcher, getAllElementsWithAttribute, coffeeBrew } from '../helpers/index'
+import { clearArray, buttonIconSwitcher, getAllElementsWithAttribute, coffeeBrew, stopPlay, buttonStateSwitcher, findActiveCup } from '../helpers/index'
 import Handle from '../../assets/expresso/handle/handle.png';
 import { cups, sound, cupIngredients } from '../../constants/index'
 import Timer from '../timer/index'
@@ -111,7 +111,7 @@ const IngredientCup = styled.img`
     height: 50px;
 `;
 
-const brewSounds = new Array(3).fill(null);
+const brewSounds = new Array(3).fill(false);
 
 function CoffeMaschine({ ingCollection }) {
 
@@ -120,49 +120,54 @@ function CoffeMaschine({ ingCollection }) {
     const [timer, setTimer] = React.useState(['none', 'none', 'none']);
     const [scoreClick, setScoreClick] = React.useState([false, false, false]);
     const [cooking, setCooking] = React.useState(['start', 'start', 'start']);
-
     const [ingCupCollection, setIngCupCollection] = React.useState([[], [], []]);
+
+    const [timeout, setTimeout] = React.useState([false, false, false]);
+
 
     let selectCup = new Audio(sound.selectcup);
     let coffeeStop = new Audio(sound.coffeeStop);
     let coffeeStart = new Audio(sound.coffeeStart);
     let answerCorrect = new Audio(sound.answerCorrect);
 
-    const setActiveButtons = React.useCallback(() => {
-        const buttonsActive = [];
-        const sucessIdx = [];
+    // TODO: Перманентный баг. Кнопка меняется на sucess, хотя в cooking стоит fail. Происходит при переключении по таймеру на fail.
+    // ["sucess", "sucess", "fail"] "buttons"
+    // ["sucess", "fail", "fail"] "buttons"
+    // ["fail", "sucess", "fail"] "buttons"
 
-        buttons.forEach((el, i) => {
-            if (el === 'sucess') { sucessIdx.push(i); }
+    const changeButtons = React.useCallback(() => {
+
+        const buttonsState = [];
+        const cookingState = [];
+
+        const cookingDataset = getAllElementsWithAttribute('data-cooking');
+
+        cookingDataset.forEach((el, i) => {
+            cookingState.push((ingCupCollection[i].length && el.dataset.cooking !== 'ready' && el.dataset.cooking !== 'fail') ? 'active' : el.dataset.cooking)
         })
 
-        ingCupCollection.forEach((arr, i) => {
-            if (Array.isArray(arr) && arr.length) {
-                buttonsActive.push('start');
-            } else {
-                buttonsActive.push('disabled');
-            }
-        });
-
-        ((sucessIdx.length) ? sucessIdx : []).forEach((idx) => {
-            buttonsActive[idx] = 'sucess';
+        cookingState.forEach((el) => {
+            buttonsState.push(buttonStateSwitcher(el));
         })
 
-        return buttonsActive;
+        setIngCupCollection([].concat(ingCupCollection));
+
+        return buttonsState;
     }, [ingCupCollection])
 
+    
     React.useEffect(() => {
-        setButtons([].concat(setActiveButtons()))
+        setButtons([].concat(changeButtons()))
         setIngCupCollection(ingCollection);
-    }, [ingCollection, setActiveButtons])
+    }, [ingCollection, changeButtons])
 
-    function handleClickCups({ target }) {
+    function handleClickCup({ target }) {
         const index = target.dataset.index;
         if (cups[index] !== true) { selectCup.play(); }
         (function () {
             const pureCups = new Array(3).fill(false);
             pureCups[index] = true;
-            setCups(pureCups.slice());
+            setCups([].concat(pureCups));
         })();
     }
 
@@ -180,12 +185,10 @@ function CoffeMaschine({ ingCollection }) {
         setCooking([].concat(cooking))
 
         timer[buttonIdx] = 'block'
-
         scoreClick[buttonIdx] = true;
-        setScoreClick([].concat(scoreClick));
 
+        setScoreClick([].concat(scoreClick));
         setButtons([].concat(buttons))
-        setIngCupCollection([].concat(ingCupCollection));
         setTimer([].concat(timer));
     }
 
@@ -194,23 +197,44 @@ function CoffeMaschine({ ingCollection }) {
 
         const buttonIdx = e.target.closest('span').dataset.index;
         const cookingActive = getAllElementsWithAttribute('data-cooking');
-        let isDone = cookingActive[buttonIdx].dataset.cooking;
+        let cookingState = cookingActive[buttonIdx].dataset.cooking;
 
-        if (isDone === 'done') {
-            answerCorrect.play();
+        function resetScore() {
             scoreClick[buttonIdx] = false;
             setScoreClick([].concat(scoreClick));
-
             resetCup(buttonIdx);
-            isDone = 'start';
-            console.log('Done! Add to score');
+            cookingState = 'start';
+            timeout[buttonIdx] = false
+            setTimeout([].concat(timeout))
         }
 
+        switch (cookingState) {
+            case 'done':
+                answerCorrect.play();
+                window.clearTimeout(timeout[buttonIdx]);
+
+                console.log(ingCupCollection[buttonIdx], 'cup ingredients');
+                
+                resetScore();
+                break;
+            case 'fail':
+                coffeeStop.play();
+                resetScore();
+                break;
+            default:
+                break;
+        }
+    }
+
+    function failCupHandle(idx) {
+        const cookingActive = getAllElementsWithAttribute('data-cooking');
+        cookingActive[idx].dataset.cooking = 'fail';
+        buttons[idx] = 'fail'
+        setButtons([].concat(buttons));
     }
 
     function resetCup(idx) {
         clearArray(ingCupCollection, idx);
-        setIngCupCollection([].concat(ingCupCollection));
 
         cooking[idx] = 'start';
         setCooking([].concat(cooking))
@@ -220,6 +244,10 @@ function CoffeMaschine({ ingCollection }) {
 
         timer[idx] = 'none';
         setTimer([].concat(timer));
+
+        window.clearTimeout(timeout[idx]);
+        timeout[idx] = false
+        setTimeout([].concat(timeout))
     }
 
     function removeCupIngredients(e) {
@@ -228,12 +256,11 @@ function CoffeMaschine({ ingCollection }) {
         const cupIdx = e.currentTarget.parentNode.dataset.index;
 
         if (brewSounds[cupIdx]) {
-            brewSounds[cupIdx].pause();
-            brewSounds[cupIdx].currentTime = 0.0;
+            stopPlay(brewSounds[cupIdx]);
             brewSounds[cupIdx] = false;
         }
 
-        resetCup(cupIdx)
+        resetCup(cupIdx);
     }
 
     const CupsList = cups.map((el, i) =>
@@ -244,12 +271,15 @@ function CoffeMaschine({ ingCollection }) {
             data-cooking={cooking[i]}
             key={i.toString()}
             selected={(el) ? true : false}
-            onClick={(e) => handleClickCups(e)}
+            onClick={(e) => handleClickCup(e)}
         >
             <IngredientInner onClick={(e) => removeCupIngredients(e)}>
                 {ingCupCollection[i].map((val, j) => {
                     return (
-                        <IngredientCup key={j.toString()} src={cupIngredients[val]} />
+                        <IngredientCup
+                            key={j.toString()}
+                            src={cupIngredients[val]}
+                        />
                     );
                 })}
             </IngredientInner>
@@ -266,7 +296,15 @@ function CoffeMaschine({ ingCollection }) {
             buttonIcon={buttonIconSwitcher(el)}
         >
 
-            <Timer score={(scoreClick[i]) ? () => scoreHandle : () => () => ''} show={timer[i]} />
+            <Timer
+                index={i}
+                key={i.toString()}
+                fail={failCupHandle}
+                animation={scoreClick[i]}
+                score={(scoreClick[i]) ? () => scoreHandle : () => () => ''}
+                show={timer[i]}
+                timeout={timeout}
+            />
 
         </CoffeMaschineButton>
     ))

@@ -29,6 +29,8 @@ import FailBtn from '../assets/expresso/buttons/orderFail.png';
 // TIMER
 // SCORE
 
+export const failTime = 2000;
+
 export const recipe = {
     'chocolate' : chocolateOrder,
     'cinnamon' : cinnamonOrder,

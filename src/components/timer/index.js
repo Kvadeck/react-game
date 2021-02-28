@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import React from 'react';
-import { getAllElementsWithAttribute, findActiveCooking } from '../helpers/index'
+import { getAllElementsWithAttribute } from '../helpers/index'
+import { failTime } from "../../constants/index";
 
 const LoadingWrapper = styled.div`
   width: 60px;
@@ -48,24 +49,32 @@ const Fill = styled.div`
     `};
 `;
 
-function Timer({show, score}) {
+function Timer({ show, score, fail, index, animation, timeout }) {
+    
+    const [timeoutIn, setTimeoutIn] = React.useState([false, false, false]);
 
-    function setCookingDone() {
+    React.useEffect(() => {
+        setTimeoutIn(timeout);
+    }, [timeout])
+
+    function setCookingDone(idx) {
         const cookingActive = getAllElementsWithAttribute('data-cooking');
-        const cookingIdx = findActiveCooking(cookingActive, 'ready');
-        cookingActive[cookingIdx].dataset.cooking = 'done';
-        setEndOfAnimation(true);
+        cookingActive[idx].dataset.cooking = 'done';
+        timeoutIn[idx] = window.setTimeout(fail.bind(window, idx), failTime);
+        setTimeoutIn([].concat(timeoutIn));
     }
 
-    const [endOfAnimation, setEndOfAnimation] = React.useState(false);
-
     return (
-        <LoadingWrapper onClick={(endOfAnimation) ? score(): () => '' } show={show}>
+        <LoadingWrapper onClick={score()} show={show}>
             <Hold left={true}>
-                <Fill left={true}/>
+                <Fill left={true} />
             </Hold>
-            <Hold onAnimationEnd={() => setCookingDone()} right={true}>
-                <Fill right={true}/>
+            <Hold 
+                onAnimationEnd={(animation) ? () => setCookingDone(index) : () => ''} 
+                right={true}>
+
+                <Fill right={true} 
+                />
             </Hold>
         </LoadingWrapper>
     );
