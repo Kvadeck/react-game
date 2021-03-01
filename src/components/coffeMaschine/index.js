@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import React from 'react';
-import { clearArray, buttonIconSwitcher, getAllElementsWithAttribute, coffeeBrew, stopPlay, buttonStateSwitcher, findActiveCup } from '../helpers/index'
+import { clearArray, buttonIconSwitcher, getAllElementsWithAttribute, coffeeBrewAudio, stopPlay, buttonStateSwitcher } from '../../helpers/index'
 import Handle from '../../assets/expresso/handle/handle.png';
 import { cups, sound, cupIngredients } from '../../constants/index'
 import Timer from '../timer/index'
@@ -113,7 +113,7 @@ const IngredientCup = styled.img`
 
 const brewSounds = new Array(3).fill(false);
 
-function CoffeMaschine({ ingCollection }) {
+function CoffeMaschine({ ingCollection, getRecipe }) {
 
     const [cups, setCups] = React.useState([true, false, false]);
     const [buttons, setButtons] = React.useState(['disabled', 'disabled', 'disabled']);
@@ -124,13 +124,12 @@ function CoffeMaschine({ ingCollection }) {
 
     const [timeout, setTimeout] = React.useState([false, false, false]);
 
-
     let selectCup = new Audio(sound.selectcup);
     let coffeeStop = new Audio(sound.coffeeStop);
     let coffeeStart = new Audio(sound.coffeeStart);
     let answerCorrect = new Audio(sound.answerCorrect);
 
-    // TODO: Перманентный баг. Кнопка меняется на sucess, хотя в cooking стоит fail. Происходит при переключении по таймеру на fail.
+    // TODO: Баг. Кнопка меняется на sucess, хотя в cooking стоит fail. Происходит при переключении по таймеру на fail.
     // ["sucess", "sucess", "fail"] "buttons"
     // ["sucess", "fail", "fail"] "buttons"
     // ["fail", "sucess", "fail"] "buttons"
@@ -177,7 +176,7 @@ function CoffeMaschine({ ingCollection }) {
         buttons[buttonIdx] = 'sucess';
         coffeeStart.play();
 
-        const audioBrew = coffeeBrew(buttonIdx);
+        const audioBrew = coffeeBrewAudio(buttonIdx);
         brewSounds[buttonIdx] = audioBrew;
         audioBrew.play();
 
@@ -212,9 +211,7 @@ function CoffeMaschine({ ingCollection }) {
             case 'done':
                 answerCorrect.play();
                 window.clearTimeout(timeout[buttonIdx]);
-
-                console.log(ingCupCollection[buttonIdx], 'cup ingredients');
-                
+                getRecipe(ingCupCollection[buttonIdx])
                 resetScore();
                 break;
             case 'fail':

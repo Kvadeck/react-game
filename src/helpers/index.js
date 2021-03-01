@@ -1,6 +1,6 @@
-import { sound } from '../../constants/index'
+import { sound } from '../constants/index'
 
-import { coffeeButtons } from '../../constants/index'
+import { coffeeButtons } from '../constants/index'
 
 export function clearArray(arr = [], index = 0) {
     while (arr[index].length > 0) {
@@ -43,7 +43,7 @@ export function findActiveCup(cups) {
     return cupIdx;
 }
 
-export function coffeeBrew(audioIdx) {
+export function coffeeBrewAudio(audioIdx) {
     audioIdx = new Audio(sound.coffeeBrew);
     return audioIdx;
 }
@@ -67,4 +67,23 @@ export function buttonStateSwitcher(dataset) {
         default:
             return console.log('buttonStateSwitcher fnc error!');
     }
+}
+
+export function removeReciept(recipts, doneRecipt) {
+    const updatedReciepts = [];
+
+    recipts.forEach((el) => {
+        const recipeEl = el['id'].join(',');
+        const doneRecipeEl = doneRecipt.join(',');
+
+        if (recipeEl !== doneRecipeEl) {
+            updatedReciepts.push({ id: recipeEl.split(',') })
+        }
+        return;
+    });
+    return updatedReciepts;
+}
+
+export function shuffle(arr) {
+    return arr.sort( () => Math.random() - 0.5);
 }

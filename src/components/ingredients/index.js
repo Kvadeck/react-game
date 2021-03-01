@@ -62,7 +62,6 @@ function Ingredients({ addIngredient }) {
                 {IngredientList}
             </JarWrapper>
         </IngredientsWrapper>
-
     );
 }
 
