@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import React from 'react';
-import { getAllElementsWithAttribute } from '../helpers/index'
+import { getAllElementsWithAttribute } from '../../helpers/index'
 import { failTime } from "../../constants/index";
 
 const LoadingWrapper = styled.div`

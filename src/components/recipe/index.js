@@ -1,9 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import BarEnd from '../../assets/recipe/barEnds.png';
 import RecipeBack from '../../assets/recipe/orderReceipt.png'
-import { recipe } from '../../constants/index'
+import { recipeImg } from '../../constants/index'
 import React from 'react';
+import { removeReciept, shuffle } from '../../helpers/index'
 
 const RecipeWrapper = styled.div`
     display: flex;
@@ -78,27 +80,32 @@ const OrderImage = styled.img`
     cursor: pointer;
 `;
 
-function Recipe() {
+function Recipe({ recipe }) {
 
-    // TODO: С каждой новой игрой возвращать случайный набор элементов в массиве. 
+    // TODO: Прибавлять очки только если рецепт выполнился
 
-    // TODO: Принимать массив из Coffee Machine. Проходить этим массивом по рецептам и им же их фильтровать. Далее после фильтрации проходить ещё раз. Если массив пустой после фильтрации то добалять его к измененному стэйту, если же нет то оставлять исходный массив.
+    const [recepts, setRecepts] = React.useState(shuffle([
+            { id: ['chocolate', 'chocolate'] },
+            { id: ['cinnamon'] },
+            { id: ['cream', 'chocolate'] },
+            { id: ['sugar', 'cream'] },
+        ])
+    );
 
-    const [recepts, setRecepts] = React.useState([
-        { 0: ['chocolate', 'chocolate'] },
-        { 1: ['cinnamon'] },
-        { 2: ['creamer', 'creamer'] },
-        { 3: ['creamer', 'creamer'] },
-    ]);
+    React.useEffect(() => {
+        if (recipe.length) {
+            setRecepts([].concat(removeReciept(recepts, recipe)))
+        }
+    }, [recipe])
 
-    const RecipeList = recepts.map((el, i) =>
+    const RecipeList = recepts && recepts.map((el, i) =>
     (
         <RecipeCard key={i.toString()}>
-            {el[i].map((val, j) => {
+            {(el['id'] || []).map((val, j) => {
                 return (
                     <OrderImage
                         key={j.toString()}
-                        src={recipe[val]}
+                        src={recipeImg[val.toString()]}
                     />
                 );
             })}
@@ -106,16 +113,17 @@ function Recipe() {
     ));
 
     return (
-
         <RecipeWrapper>
             <Curtain />
             <RecipeCardWrapper>
                 {RecipeList}
             </RecipeCardWrapper>
         </RecipeWrapper>
-
     );
 }
 
+Recipe.propTypes = {
+    recipe: PropTypes.array,
+}
 
 export default Recipe;

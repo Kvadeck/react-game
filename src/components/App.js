@@ -3,9 +3,10 @@ import Inner from './blocks/Inner'
 import Ingredients from './ingredients/index'
 import CoffeMaschine from './coffeMaschine/index'
 import Recipe from './recipe/index'
+import Hud from './hud/index'
 import React from 'react';
 import { sound } from '../constants/index'
-import { getAllElementsWithAttribute, findActiveCup } from './helpers/index'
+import { getAllElementsWithAttribute, findActiveCup } from '../helpers/index'
 const Main = styled.div`
     display:flex;
     justify-content:center;
@@ -15,6 +16,7 @@ const Main = styled.div`
 function App() {
 
   const [ingCollection, setIngCollection] = React.useState([[],[],[]]);    
+  const [recipe, setRecipe] = React.useState([]);    
   let ingredientClick = new Audio(sound.ingredientClick);
 
   function addIngredientHandle({target}) {
@@ -37,11 +39,16 @@ function App() {
     setIngCollection([].concat(ingCollection));
   }
 
+  function getRecipeHandle(recipe) {
+    setRecipe([].concat(recipe));
+  }
+
   return (
     <Main>
       <Inner justifyContent='center' maxWidth='500px'>
-        <Recipe/>
-        <CoffeMaschine ingCollection={ingCollection} />
+        <Hud/>
+        <Recipe recipe={recipe}/>
+        <CoffeMaschine getRecipe={getRecipeHandle} ingCollection={ingCollection} />
         <Ingredients addIngredient = {() => addIngredientHandle}/>
       </Inner>
     </Main>
