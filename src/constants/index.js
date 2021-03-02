@@ -26,10 +26,8 @@ import StartServeBtn from '../assets/expresso/buttons/startServe.png';
 import SucessBtn from '../assets/expresso/buttons/serveSuccess.png';
 import FailBtn from '../assets/expresso/buttons/orderFail.png';
 
-// TIMER
-// SCORE
-
 export const failTime = 1500;
+export const scorePlus = 120;
 
 export const recipeImg = {
     'chocolate' : chocolateOrder,
@@ -74,7 +72,8 @@ export const sound = {
     coffeeStop: '/sound/coffeeStop.mp3',
     coffeeStart: '/sound/coffeeStart.mp3',
     answerCorrect: '/sound/answerCorrect.mp3',
-    coffeeBrew: '/sound/coffeeBrew.mp3'
+    coffeeBrew: '/sound/coffeeBrew.mp3',
+    guitarRadioAmbienceLoop: '/sound/guitarRadioAmbienceLoop.mp3'
 }
 
 

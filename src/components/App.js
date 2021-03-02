@@ -6,50 +6,92 @@ import Recipe from './recipe/index'
 import Hud from './hud/index'
 import React from 'react';
 import { sound } from '../constants/index'
-import { getAllElementsWithAttribute, findActiveCup } from '../helpers/index'
+import { getAllElementsWithAttribute, findActiveCup, stopPlay } from '../helpers/index'
+import Sound from 'react-sound';
+
 const Main = styled.div`
     display:flex;
     justify-content:center;
     width: 100%;
 `;
 
+window.soundManager.setup({ debugMode: false });
+
 function App() {
 
-  const [ingCollection, setIngCollection] = React.useState([[],[],[]]);    
-  const [recipe, setRecipe] = React.useState([]);    
-  let ingredientClick = new Audio(sound.ingredientClick);
+  const [ingCollection, setIngCollection] = React.useState([[], [], []]);
+  const [recipe, setRecipe] = React.useState([]);
+  const [recipeCount, setRecipeCount] = React.useState(4);
+  const [score, setScore] = React.useState(0);
+  const [playing, setPlaying] = React.useState(false);
 
-  function addIngredientHandle({target}) {
+  let ingredientClick = new Audio(sound.ingredientClick);
+  let audioLocalState = localStorage.getItem('audio');
+
+  function addIngredientHandle({ target }) {
 
     const ingName = target.id;
-    
+
     const cupsActive = getAllElementsWithAttribute('data-active');
     const activeCupIdx = findActiveCup(cupsActive);
 
     const isCooking = cupsActive[activeCupIdx].dataset.cooking;
 
-    if (ingCollection[activeCupIdx].length > 1 
+    if (ingCollection[activeCupIdx].length > 1
       || isCooking === 'ready' || isCooking === 'done' || isCooking === 'fail') {
       return;
     } else {
       ingCollection[activeCupIdx].push(ingName);
     }
 
-    ingredientClick.play();
+    if (audioLocalState === 'off') {
+      stopPlay(ingredientClick)
+    } else {
+      ingredientClick.play();
+    }
     setIngCollection([].concat(ingCollection));
   }
+  const toggleAmbienceSoundHandle = () => setPlaying(!playing);
 
   function getRecipeHandle(recipe) {
     setRecipe([].concat(recipe));
   }
 
+  function getRecipeCountHandle(count) {
+    setRecipeCount(count);
+  }
+
+  function scoreAddHandle(count) {
+    setScore(score + count);
+  }
+
   return (
     <Main>
+      <Sound
+        url={sound.guitarRadioAmbienceLoop}
+        playStatus={(playing) ? Sound.status.PLAYING : Sound.status.STOPPED}
+        loop={true}
+      />
+
       <Inner justifyContent='center' maxWidth='500px'>
-        <Hud/>
-        <Recipe recipe={recipe}/>
-        <CoffeMaschine getRecipe={getRecipeHandle} ingCollection={ingCollection} />
-        <Ingredients addIngredient = {() => addIngredientHandle}/>
+        <Hud
+          playing={playing}
+          toggleAmbienceSound={toggleAmbienceSoundHandle}
+          score={score}
+          recipeCount={recipeCount}
+        />
+        <Recipe
+          recipe={recipe}
+          getRecipeCount={getRecipeCountHandle}
+          scoreAdd={scoreAddHandle}
+          recipeCount={recipeCount}
+        />
+
+        <CoffeMaschine
+          getRecipe={getRecipeHandle}
+          ingCollection={ingCollection}
+        />
+        <Ingredients addIngredient={() => addIngredientHandle} />
       </Inner>
     </Main>
   );

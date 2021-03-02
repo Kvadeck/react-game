@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import React from 'react';
+import { storeAudio } from '../../helpers/index'
 
 const HudWrapper = styled.div`
   display: flex;
@@ -32,39 +33,46 @@ const HudText = styled.span`
   font-size: 1.2rem;
 `;
 
-function Hud() {
-    const [sound, setSound] = React.useState([false]);
+function Hud({ recipeCount, score, toggleAmbienceSound, playing }) {
+
+    let audioLocalState = localStorage.getItem('audio') || 'off';
+    const [sound, setSound] = React.useState((audioLocalState === 'off') ? true : false);
 
     function soundSwitchHandle() {
-        // TODO: Функция выключения звука
+        storeAudio(!sound);
         setSound(!sound);
     }
 
-    React.useEffect(() => {
-
-    }, [])
-
     return (
         <HudWrapper>
-            <HudOuter cursor={'pointer'} onClick={() => soundSwitchHandle()}>
+            <HudOuter cursor={'pointer'}>
+                <HudText>menu</HudText>
+            </HudOuter>
+            <HudOuter cursor={'pointer'} onClick={() => toggleAmbienceSound()}>
+                <HudText>music</HudText>
+                <HudText>{playing ? 'on' : 'off'}</HudText>
+            </HudOuter>
+            <HudOuter width={'100px'} cursor={'pointer'} onClick={() => soundSwitchHandle()}>
                 <HudText>sound</HudText>
-                <HudText>{sound ? 'off': 'on'}</HudText>
+                <HudText>{sound ? 'off' : 'on'}</HudText>
             </HudOuter>
             <HudOuter width={'120px'}>
                 <HudText>orders</HudText>
-                <HudText>{}</HudText>
+                <HudText>{recipeCount}</HudText>
             </HudOuter>
             <HudOuter>
                 <HudText>score</HudText>
-                <HudText>0</HudText>
+                <HudText>{score}</HudText>
             </HudOuter>
         </HudWrapper>
     );
 }
 
 Hud.propTypes = {
-    show: PropTypes.string,
-    score: PropTypes.func,
+    recipeCount: PropTypes.number,
+    score: PropTypes.number,
+    toggleAmbienceSound: PropTypes.func,
+    playing: PropTypes.bool
 }
 
 export default Hud;

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import BarEnd from '../../assets/recipe/barEnds.png';
 import RecipeBack from '../../assets/recipe/orderReceipt.png'
-import { recipeImg } from '../../constants/index'
+import { recipeImg, scorePlus } from '../../constants/index'
 import React from 'react';
 import { removeReciept, shuffle } from '../../helpers/index'
 
@@ -80,21 +80,24 @@ const OrderImage = styled.img`
     cursor: pointer;
 `;
 
-function Recipe({ recipe }) {
-
-    // TODO: Прибавлять очки только если рецепт выполнился
+function Recipe({ recipe, getRecipeCount, scoreAdd, recipeCount }) {
 
     const [recepts, setRecepts] = React.useState(shuffle([
-            { id: ['chocolate', 'chocolate'] },
-            { id: ['cinnamon'] },
-            { id: ['cream', 'chocolate'] },
-            { id: ['sugar', 'cream'] },
+        { id: ['chocolate', 'chocolate'] },
+        { id: ['cinnamon'] },
+        { id: ['cream', 'chocolate'] },
+        { id: ['sugar', 'cream'] },
         ])
     );
 
     React.useEffect(() => {
         if (recipe.length) {
-            setRecepts([].concat(removeReciept(recepts, recipe)))
+            const removed = removeReciept(recepts, recipe);
+            if(recipeCount !== removed.length) {
+                scoreAdd(scorePlus)
+            }
+            getRecipeCount(removed.length);
+            setRecepts([].concat(removed))
         }
     }, [recipe])
 
@@ -124,6 +127,9 @@ function Recipe({ recipe }) {
 
 Recipe.propTypes = {
     recipe: PropTypes.array,
+    getRecipeCount: PropTypes.func,
+    scoreAdd: PropTypes.func,
+    recipeCount: PropTypes.number
 }
 
 export default Recipe;
