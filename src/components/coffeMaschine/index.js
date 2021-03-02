@@ -113,6 +113,12 @@ const IngredientCup = styled.img`
 
 const brewSounds = new Array(3).fill(false);
 
+    // TODO: Баг. Кнопка меняется на sucess, хотя в cooking стоит fail.     
+    // Происходит при переключении по таймеру на fail.
+    // ["sucess", "sucess", "fail"] "buttons"
+    // ["sucess", "fail", "fail"] "buttons"
+    // ["fail", "sucess", "fail"] "buttons"
+
 function CoffeMaschine({ ingCollection, getRecipe }) {
 
     const [cups, setCups] = React.useState([true, false, false]);
@@ -124,15 +130,12 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
 
     const [timeout, setTimeout] = React.useState([false, false, false]);
 
+    let audioLocalState = localStorage.getItem('audio');
+
     let selectCup = new Audio(sound.selectcup);
     let coffeeStop = new Audio(sound.coffeeStop);
     let coffeeStart = new Audio(sound.coffeeStart);
     let answerCorrect = new Audio(sound.answerCorrect);
-
-    // TODO: Баг. Кнопка меняется на sucess, хотя в cooking стоит fail. Происходит при переключении по таймеру на fail.
-    // ["sucess", "sucess", "fail"] "buttons"
-    // ["sucess", "fail", "fail"] "buttons"
-    // ["fail", "sucess", "fail"] "buttons"
 
     const changeButtons = React.useCallback(() => {
 
@@ -154,7 +157,6 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
         return buttonsState;
     }, [ingCupCollection])
 
-    
     React.useEffect(() => {
         setButtons([].concat(changeButtons()))
         setIngCupCollection(ingCollection);
@@ -162,7 +164,10 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
 
     function handleClickCup({ target }) {
         const index = target.dataset.index;
-        if (cups[index] !== true) { selectCup.play(); }
+
+        if (cups[index] !== true) { selectCup.play() }
+        if (audioLocalState === 'off') { stopPlay(selectCup); }
+
         (function () {
             const pureCups = new Array(3).fill(false);
             pureCups[index] = true;
@@ -174,11 +179,17 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
         const buttonIdx = target.dataset.index;
 
         buttons[buttonIdx] = 'sucess';
-        coffeeStart.play();
 
         const audioBrew = coffeeBrewAudio(buttonIdx);
         brewSounds[buttonIdx] = audioBrew;
-        audioBrew.play();
+
+        if (audioLocalState === 'off') {
+            stopPlay(coffeeStart)
+            stopPlay(audioBrew)
+        } else {
+            coffeeStart.play();
+            audioBrew.play();
+        }
 
         cooking[buttonIdx] = 'ready';
         setCooking([].concat(cooking))
@@ -206,16 +217,24 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
             timeout[buttonIdx] = false
             setTimeout([].concat(timeout))
         }
+        
+        function muteAudioScore(audioObj ) {
+            if (audioLocalState === 'off') {
+                stopPlay(audioObj)
+            } else {
+                audioObj.play();
+            }
+        }
 
         switch (cookingState) {
             case 'done':
-                answerCorrect.play();
+                muteAudioScore(answerCorrect)
                 window.clearTimeout(timeout[buttonIdx]);
                 getRecipe(ingCupCollection[buttonIdx])
                 resetScore();
                 break;
             case 'fail':
-                coffeeStop.play();
+                muteAudioScore(coffeeStop)
                 resetScore();
                 break;
             default:
@@ -249,7 +268,13 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
 
     function removeCupIngredients(e) {
         e.stopPropagation();
-        coffeeStop.play();
+
+        if (audioLocalState === 'off') {
+            stopPlay(coffeeStop)
+        } else {
+            coffeeStop.play()
+        }
+
         const cupIdx = e.currentTarget.parentNode.dataset.index;
 
         if (brewSounds[cupIdx]) {
