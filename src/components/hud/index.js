@@ -1,7 +1,13 @@
+/* eslint-disable no-restricted-globals */
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import React from 'react';
-import { storeAudio } from '../../helpers/index'
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
+import Modal from 'react-modal';
+import MaschineImage from '../../assets/help.jpg';
+import CrossImage from '../../assets/cross.png';
+import { recipeEndConfirm, helpText } from '../../constants/index'
 
 const HudWrapper = styled.div`
   display: flex;
@@ -33,28 +39,117 @@ const HudText = styled.span`
   font-size: 1.2rem;
 `;
 
-function Hud({ recipeCount, score, toggleAmbienceSound, playing }) {
+const ModalButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  position: relative;
+  margin-bottom: 10px;
+`;
+const ModalButtonClose = styled.a`
+  cursor: pointer;
+`;
 
-    let audioLocalState = localStorage.getItem('audio') || 'off';
-    const [sound, setSound] = React.useState((audioLocalState === 'off') ? true : false);
+const ModalContentWrapper = styled.div`
+  display: flex;
+  font-size: 1.4rem;
+  margin: 20px;
+`;
 
-    function soundSwitchHandle() {
-        storeAudio(!sound);
-        setSound(!sound);
+const MaschineImg = styled.img`
+    width: auto;
+    height: auto;
+    margin-bottom: 10px;
+    margin-left: 20px;
+`;
+const ModalButtonCloseImg = styled.img`
+    width: 20px;
+    height: 20px;
+`;
+
+Modal.setAppElement('#root')
+
+function Hud({ recipeCount, score, toggleAmbienceSound, playing, soundSwitch, allSound }) {
+
+    const [fullscreen, setFullscreen] = React.useState(true);
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+
+    const modalStyles = {
+        content: {
+            width: '500px',
+            height: 'fit-content',
+            margin: '0 auto',
+        }
+    };
+
+    React.useEffect(() => {
+        if (!recipeCount) {
+            confirm(recipeEndConfirm);
+            document.location.reload();
+        }
+    }, [recipeCount])
+
+    function openModalHandle() {
+        setIsOpen(true);
+    }
+
+    function closeModalHandle() {
+        setIsOpen(false);
+    }
+
+    const toggleFullScreenHandle = () => {
+        setFullscreen(!fullscreen)
+        if (fullscreen) {
+            document.documentElement.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    };
+
+    const arrowEmpty = (
+        <span />
+    )
+
+    const dropDownOptions = [
+        'New', 'Fullscreen', 'Help'
+    ];
+
+    function dropDownHandle(option) {
+        let newOption, fullScreenOption, helpOption;
+        [newOption, fullScreenOption, helpOption] = [...dropDownOptions];
+
+        if (option.label === newOption) {
+            document.location.reload();
+        }
+        else if (option.label === fullScreenOption) {
+            toggleFullScreenHandle();
+        }
+        else if (option.label === helpOption) {
+            openModalHandle();
+        }
     }
 
     return (
+
         <HudWrapper>
-            <HudOuter cursor={'pointer'}>
-                <HudText>menu</HudText>
-            </HudOuter>
+
+            <Dropdown
+                arrowClosed={arrowEmpty}
+                arrowOpen={arrowEmpty}
+                onChange={(option) => dropDownHandle(option)}
+                controlClassName='menu-dropdown-control'
+                menuClassName='menu-dropdown-link'
+                options={dropDownOptions}
+                placeholder="Menu" />
+
             <HudOuter cursor={'pointer'} onClick={() => toggleAmbienceSound()}>
                 <HudText>music</HudText>
                 <HudText>{playing ? 'on' : 'off'}</HudText>
             </HudOuter>
-            <HudOuter width={'100px'} cursor={'pointer'} onClick={() => soundSwitchHandle()}>
+
+            <HudOuter width={'100px'} cursor={'pointer'} onClick={soundSwitch}>
                 <HudText>sound</HudText>
-                <HudText>{sound ? 'off' : 'on'}</HudText>
+                <HudText>{allSound ? 'off' : 'on'}</HudText>
             </HudOuter>
             <HudOuter width={'120px'}>
                 <HudText>orders</HudText>
@@ -64,6 +159,27 @@ function Hud({ recipeCount, score, toggleAmbienceSound, playing }) {
                 <HudText>score</HudText>
                 <HudText>{score}</HudText>
             </HudOuter>
+
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModalHandle}
+                contentLabel="Example Modal"
+                style={modalStyles}
+                overlayClassName='overlay'
+            >
+                <ModalButtonWrapper>
+
+                    <ModalButtonClose onClick={closeModalHandle}>
+                        <ModalButtonCloseImg src={CrossImage} />
+                    </ModalButtonClose>
+
+                </ModalButtonWrapper>
+                <MaschineImg src={MaschineImage} />
+                <ModalContentWrapper>
+                    {helpText}
+                </ModalContentWrapper>
+            </Modal>
+
         </HudWrapper>
     );
 }

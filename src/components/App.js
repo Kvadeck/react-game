@@ -5,9 +5,9 @@ import CoffeMaschine from './coffeMaschine/index'
 import Recipe from './recipe/index'
 import Hud from './hud/index'
 import React from 'react';
-import { sound } from '../constants/index'
-import { getAllElementsWithAttribute, findActiveCup, stopPlay } from '../helpers/index'
+import { getAllElementsWithAttribute, findActiveCup, stopPlay, storeAudio } from '../helpers/index'
 import Sound from 'react-sound';
+import { sound } from '../constants/index'
 
 const Main = styled.div`
     display:flex;
@@ -26,7 +26,14 @@ function App() {
   const [playing, setPlaying] = React.useState(false);
 
   let ingredientClick = new Audio(sound.ingredientClick);
-  let audioLocalState = localStorage.getItem('audio');
+  let audioLocalState = localStorage.getItem('audio') || 'off';
+
+  const [allSound, setAllSound] = React.useState((audioLocalState === 'off') ? true : false);
+
+  function soundSwitchHandle() {
+    storeAudio(!allSound);
+    setAllSound(!allSound);
+  }
 
   function addIngredientHandle({ target }) {
 
@@ -67,6 +74,7 @@ function App() {
 
   return (
     <Main>
+
       <Sound
         url={sound.guitarRadioAmbienceLoop}
         playStatus={(playing) ? Sound.status.PLAYING : Sound.status.STOPPED}
@@ -75,10 +83,12 @@ function App() {
 
       <Inner justifyContent='center' maxWidth='500px'>
         <Hud
+          allSound={allSound}
           playing={playing}
           toggleAmbienceSound={toggleAmbienceSoundHandle}
           score={score}
           recipeCount={recipeCount}
+          soundSwitch = {soundSwitchHandle}
         />
         <Recipe
           recipe={recipe}
@@ -93,7 +103,9 @@ function App() {
         />
         <Ingredients addIngredient={() => addIngredientHandle} />
       </Inner>
+
     </Main>
+
   );
 }
 
