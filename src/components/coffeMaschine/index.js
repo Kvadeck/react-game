@@ -285,21 +285,48 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
         resetCup(cupIdx);
     }
 
-    function removeIngredientsFrmCup(e) {
+        const buttonIdx = e.target.closest('span').dataset.index;
+        const cookingActive = getAllElementsWithAttribute('data-cooking');
+        let isDone = cookingActive[buttonIdx].dataset.cooking;
+
+        if (isDone === 'done') {
+            answerCorrect.play();
+            scoreClick[buttonIdx] = false;
+            setScoreClick([].concat(scoreClick));
+
+            resetCup(buttonIdx);
+            isDone = 'start';
+            console.log('Done! Add to score');
+        }
+
+    }
+
+    function resetCup(idx) {
+        clearArray(ingCupCollection, idx);
+        setIngCupCollection([].concat(ingCupCollection));
+
+        cooking[idx] = 'start';
+        setCooking([].concat(cooking))
+
+        buttons[idx] = 'disabled';
+        setButtons([].concat(buttons));
+
+        timer[idx] = 'none';
+        setTimer([].concat(timer));
+    }
+
+    function removeCupIngredients(e) {
         e.stopPropagation();
         coffeeStop.play();
         const cupIdx = e.currentTarget.parentNode.dataset.index;
 
-        const cups = document.querySelectorAll('.cup');
-        cups[cupIdx].dataset.cooking = false; 
+        if (brewSounds[cupIdx]) {
+            brewSounds[cupIdx].pause();
+            brewSounds[cupIdx].currentTime = 0.0;
+            brewSounds[cupIdx] = false;
+        }
 
-        rmFrmIngCupCollection(ingCupCollection, cupIdx);
-        setIngCupCollection([].concat(ingCupCollection));
-        buttons[cupIdx] = 'disabled';
-        setButtons([].concat(buttons));
-
-        timer[cupIdx] = 'none';
-        setTimer([].concat(timer));
+        resetCup(cupIdx)
     }
 
     const CupsList = cups.map((el, i) =>
