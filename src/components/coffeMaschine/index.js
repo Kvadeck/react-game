@@ -289,13 +289,19 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
         e.stopPropagation();
         coffeeStop.play();
         const cupIdx = e.currentTarget.parentNode.dataset.index;
-        while(ingCupCollection[cupIdx].length > 0) {
-            ingCupCollection[cupIdx].pop();
-        }
+
+        const cups = document.querySelectorAll('.cup');
+        cups[cupIdx].dataset.cooking = false; 
+
+        rmFrmIngCupCollection(ingCupCollection, cupIdx);
         setIngCupCollection([].concat(ingCupCollection));
-        setButtons([].concat(setActiveButtons()))
+        buttons[cupIdx] = 'disabled';
+        setButtons([].concat(buttons));
+
+        timer[cupIdx] = 'none';
+        setTimer([].concat(timer));
     }
- 
+
     const CupsList = cups.map((el, i) =>
     (
         <CupsItem
