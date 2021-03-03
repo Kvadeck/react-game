@@ -8,7 +8,9 @@ import React from 'react';
 import { getAllElementsWithAttribute, findActiveCup, stopPlay, storeAudio } from '../helpers/index'
 import Sound from 'react-sound';
 import { sound } from '../constants/index'
-import { getAllElementsWithAttribute, findActiveCup } from '../helpers/index'
+import { getAllElementsWithAttribute, findActiveCup, stopPlay } from '../helpers/index'
+import Sound from 'react-sound';
+
 const Main = styled.div`
     display:flex;
     justify-content:center;
@@ -76,9 +78,16 @@ function App() {
     setRecipe([].concat(recipe));
   }
 
+  function getRecipeCountHandle(count) {
+    setRecipeCount(count);
+  }
+
+  function scoreAddHandle(count) {
+    setScore(score + count);
+  }
+
   return (
     <Main>
-
       <Sound
         url={sound.guitarRadioAmbienceLoop}
         playStatus={(playing) ? Sound.status.PLAYING : Sound.status.STOPPED}
