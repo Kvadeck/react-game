@@ -10,6 +10,7 @@ import Sound from 'react-sound';
 import { sound } from '../constants/index'
 import { getAllElementsWithAttribute, findActiveCup, stopPlay } from '../helpers/index'
 import Sound from 'react-sound';
+import { sound } from '../constants/index'
 
 const Main = styled.div`
     display:flex;
@@ -88,6 +89,7 @@ function App() {
 
   return (
     <Main>
+
       <Sound
         url={sound.guitarRadioAmbienceLoop}
         playStatus={(playing) ? Sound.status.PLAYING : Sound.status.STOPPED}
