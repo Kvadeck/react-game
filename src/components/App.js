@@ -8,7 +8,7 @@ import React from 'react';
 import { getAllElementsWithAttribute, findActiveCup, stopPlay, storeAudio } from '../helpers/index'
 import Sound from 'react-sound';
 import { sound } from '../constants/index'
-import { getAllElementsWithAttribute, findActiveCup } from './helpers/index'
+import { getAllElementsWithAttribute, findActiveCup } from '../helpers/index'
 const Main = styled.div`
     display:flex;
     justify-content:center;
@@ -70,6 +70,10 @@ function App() {
 
   function scoreAddHandle(count) {
     setScore(score + count);
+  }
+
+  function getRecipeHandle(recipe) {
+    setRecipe([].concat(recipe));
   }
 
   return (

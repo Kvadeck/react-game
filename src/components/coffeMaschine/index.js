@@ -303,9 +303,7 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
             case 'done':
                 answerCorrect.play();
                 window.clearTimeout(timeout[buttonIdx]);
-
-                console.log(ingCupCollection[buttonIdx], 'cup ingredients');
-                
+                getRecipe(ingCupCollection[buttonIdx])
                 resetScore();
                 break;
             case 'fail':
