@@ -285,6 +285,17 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
         resetCup(cupIdx);
     }
 
+    function removeIngredientsFrmCup(e) {
+        e.stopPropagation();
+        coffeeStop.play();
+        const cupIdx = e.currentTarget.parentNode.dataset.index;
+        while(ingCupCollection[cupIdx].length > 0) {
+            ingCupCollection[cupIdx].pop();
+        }
+        setIngCupCollection([].concat(ingCupCollection));
+        setButtons([].concat(setActiveButtons()))
+    }
+ 
     const CupsList = cups.map((el, i) =>
     (
         <CupsItem
