@@ -29,41 +29,47 @@ import FailBtn from '../assets/expresso/buttons/orderFail.png';
 export const failTime = 1500;
 export const scorePlus = 120;
 
+
+export const recipeEndConfirm = 'К сожалению на сегодня рецептов больше нет. (демо)';
+
+export const helpText = 'Это будет краткая инструкция к работе кофеварки. Можно добавлять один из пяти ингредиентов. Такие, как сливки, корица, шоколад, сахар, кофейные зерна. Каждый клиент выбирает по вкусу. Поэтому тебе нужно приготовить кофе по рецепту. За каждый выполненный рецепт ты получишь очки. Чем больше рецептов ты выполнишь, тем больше очков ты получишь. На сегодня у тебя всего четыре рецепта. Но подожди и со временем будет больше. Будь внимателен когда будешь готовить кофе. Так как если передержать кофе, то оно будет считаться испорченным.';
+
+
 export const recipeImg = {
-    'chocolate' : chocolateOrder,
-    'cinnamon' : cinnamonOrder,
-    'cream' : creamerOrder,
-    'milk' : milkOrder,
-    'sugar' : sugarOrder,
+    'chocolate': chocolateOrder,
+    'cinnamon': cinnamonOrder,
+    'cream': creamerOrder,
+    'milk': milkOrder,
+    'sugar': sugarOrder,
 }
 
 export const ingredients = {
-    'chocolate' : Chocolate,
-    'cinnamon' : Cinnamon,
-    'coffee' : Coffee,
-    'milk' : Cream,
-    'sugar' : Sugar,
+    'chocolate': Chocolate,
+    'cinnamon': Cinnamon,
+    'coffee': Coffee,
+    'milk': Cream,
+    'sugar': Sugar,
 }
 
 export const cups = {
-    'selected' : CupSelected,
-    'normal' : Cup,
+    'selected': CupSelected,
+    'normal': Cup,
 }
 
 export const cupIngredients = {
-    'chocolate' : chocolateIngredient,
-    'cinnamon' : cinnamonIngredient,
-    'coffee' : coffeeIngredient,
-    'cream' : creamIngredient,
-    'sugar' : sugarIngredient,
+    'chocolate': chocolateIngredient,
+    'cinnamon': cinnamonIngredient,
+    'coffee': coffeeIngredient,
+    'cream': creamIngredient,
+    'sugar': sugarIngredient,
 }
 
 export const IngredientCustoms = [
-    {id:'cinnamon', src: ingredients['cinnamon'], width:'45px', top:'35px', height:'54px'},
-    {id:'cream', src: ingredients['milk'], width:'45px', top:'27px', height:'61px'},
-    {id:'chocolate', src: ingredients['chocolate'], width:'50px', top:'45px', height:'41px'},
-    {id:'sugar', src: ingredients['sugar'], width:'50px', top:'34px', height:'53px'},
-    {id:'coffee', src: ingredients['coffee'], width:'50px', top:'41px', height:'39px'},
+    { id: 'cinnamon', src: ingredients['cinnamon'], width: '45px', top: '35px', height: '54px' },
+    { id: 'cream', src: ingredients['milk'], width: '45px', top: '27px', height: '61px' },
+    { id: 'chocolate', src: ingredients['chocolate'], width: '50px', top: '45px', height: '41px' },
+    { id: 'sugar', src: ingredients['sugar'], width: '50px', top: '34px', height: '53px' },
+    { id: 'coffee', src: ingredients['coffee'], width: '50px', top: '41px', height: '39px' },
 ]
 
 export const sound = {
@@ -78,9 +84,9 @@ export const sound = {
 
 
 export const coffeeButtons = {
-    'enabled' : ServeEnabledBtn,
-    'disabled' : ServeDisabledBtn,
-    'start' : StartServeBtn,
-    'sucess' : SucessBtn,
-    'fail' : FailBtn,
+    'enabled': ServeEnabledBtn,
+    'disabled': ServeDisabledBtn,
+    'start': StartServeBtn,
+    'sucess': SucessBtn,
+    'fail': FailBtn,
 }

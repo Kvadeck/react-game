@@ -2,12 +2,14 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import JarEmpty from '../../assets/ingredients/JarEmpty.png';
 import { IngredientCustoms } from '../../constants/index'
+import Footer from '../footer';
 
 const IngredientsWrapper = styled.div`
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     position: relative;
     width: 100%;
+    flex-direction: column;
     align-items: flex-start;
     min-height: 250px;
     background-color: var(--background-ingredients-color);
@@ -61,6 +63,7 @@ function Ingredients({ addIngredient }) {
             <JarWrapper>
                 {IngredientList}
             </JarWrapper>
+            <Footer/>
         </IngredientsWrapper>
     );
 }

@@ -57,6 +57,24 @@ export const GlobalStyle = createGlobalStyle`
     list-style-type: none;
   }
 
+  .menu-dropdown-control {
+    color: black;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: white;
+    opacity: .4;
+  }
+  .menu-dropdown-link {
+    font-size: 1.2rem;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0px;
+    z-index: 1000;
+  }
+
   @keyframes right {
     0% {
       -webkit-transform: rotate(0deg);
