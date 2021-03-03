@@ -157,6 +157,7 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
         return buttonsState;
     }, [ingCupCollection])
 
+    
     React.useEffect(() => {
         setButtons([].concat(changeButtons()))
         setIngCupCollection(ingCollection);
@@ -289,21 +290,42 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
         const cookingActive = getAllElementsWithAttribute('data-cooking');
         let isDone = cookingActive[buttonIdx].dataset.cooking;
 
-        if (isDone === 'done') {
-            answerCorrect.play();
+        function resetScore() {
             scoreClick[buttonIdx] = false;
             setScoreClick([].concat(scoreClick));
-
             resetCup(buttonIdx);
-            isDone = 'start';
-            console.log('Done! Add to score');
+            cookingState = 'start';
+            timeout[buttonIdx] = false
+            setTimeout([].concat(timeout))
         }
 
+        switch (cookingState) {
+            case 'done':
+                answerCorrect.play();
+                window.clearTimeout(timeout[buttonIdx]);
+
+                console.log(ingCupCollection[buttonIdx], 'cup ingredients');
+                
+                resetScore();
+                break;
+            case 'fail':
+                coffeeStop.play();
+                resetScore();
+                break;
+            default:
+                break;
+        }
+    }
+
+    function failCupHandle(idx) {
+        const cookingActive = getAllElementsWithAttribute('data-cooking');
+        cookingActive[idx].dataset.cooking = 'fail';
+        buttons[idx] = 'fail'
+        setButtons([].concat(buttons));
     }
 
     function resetCup(idx) {
         clearArray(ingCupCollection, idx);
-        setIngCupCollection([].concat(ingCupCollection));
 
         cooking[idx] = 'start';
         setCooking([].concat(cooking))
@@ -313,6 +335,10 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
 
         timer[idx] = 'none';
         setTimer([].concat(timer));
+
+        window.clearTimeout(timeout[idx]);
+        timeout[idx] = false
+        setTimeout([].concat(timeout))
     }
 
     function removeCupIngredients(e) {
@@ -321,12 +347,11 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
         const cupIdx = e.currentTarget.parentNode.dataset.index;
 
         if (brewSounds[cupIdx]) {
-            brewSounds[cupIdx].pause();
-            brewSounds[cupIdx].currentTime = 0.0;
+            stopPlay(brewSounds[cupIdx]);
             brewSounds[cupIdx] = false;
         }
 
-        resetCup(cupIdx)
+        resetCup(cupIdx);
     }
 
     const CupsList = cups.map((el, i) =>
