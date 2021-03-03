@@ -87,3 +87,7 @@ export function removeReciept(recipts, doneRecipt) {
 export function shuffle(arr) {
     return arr.sort( () => Math.random() - 0.5);
 }
+
+export function storeAudio(state) {
+    localStorage.setItem('audio', (state) ? 'off' : 'on');
+}

@@ -157,7 +157,6 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
         return buttonsState;
     }, [ingCupCollection])
 
-    
     React.useEffect(() => {
         setButtons([].concat(changeButtons()))
         setIngCupCollection(ingCollection);
@@ -301,13 +300,13 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
 
         switch (cookingState) {
             case 'done':
-                answerCorrect.play();
+                muteAudioScore(answerCorrect)
                 window.clearTimeout(timeout[buttonIdx]);
                 getRecipe(ingCupCollection[buttonIdx])
                 resetScore();
                 break;
             case 'fail':
-                coffeeStop.play();
+                muteAudioScore(coffeeStop)
                 resetScore();
                 break;
             default:
@@ -341,7 +340,13 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
 
     function removeCupIngredients(e) {
         e.stopPropagation();
-        coffeeStop.play();
+
+        if (audioLocalState === 'off') {
+            stopPlay(coffeeStop)
+        } else {
+            coffeeStop.play()
+        }
+
         const cupIdx = e.currentTarget.parentNode.dataset.index;
 
         if (brewSounds[cupIdx]) {
