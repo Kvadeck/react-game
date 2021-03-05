@@ -13,7 +13,6 @@ const Root = () => (
   </React.Fragment>
 )
 
-
 ReactDOM.render(
     <StyleSheetManager disableVendorPrefixes={process.env.NODE_ENV === 'development'}>
       <Root />

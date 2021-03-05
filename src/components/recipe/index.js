@@ -1,11 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import BarEnd from '../../assets/recipe/barEnds.png';
 import RecipeBack from '../../assets/recipe/orderReceipt.png'
 import { recipeImg, scorePlus } from '../../constants/index'
 import React from 'react';
-import { removeReciept, shuffle } from '../../helpers/index'
+import { shuffle } from '../../helpers/index'
+import { v4 as uuid } from 'uuid'
+
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 const RecipeWrapper = styled.div`
     display: flex;
@@ -83,43 +87,58 @@ const OrderImage = styled.img`
 function Recipe({ recipe, getRecipeCount, scoreAdd, recipeCount }) {
 
     const [recepts, setRecepts] = React.useState(shuffle([
-        { id: ['chocolate', 'chocolate'] },
-        { id: ['cinnamon'] },
-        { id: ['cream', 'chocolate'] },
-        { id: ['sugar', 'cream'] },
-        ])
+        { id: uuid(), ingredients: ['chocolate', 'chocolate'] },
+        { id: uuid(), ingredients: ['cinnamon'] },
+        { id: uuid(), ingredients: ['cream', 'chocolate'] },
+        { id: uuid(), ingredients: ['sugar', 'cream'] },
+    ])
     );
 
     React.useEffect(() => {
         if (recipe.length) {
-            const removed = removeReciept(recepts, recipe);
-            if(recipeCount !== removed.length) {
-                scoreAdd(scorePlus)
-            }
+
+            const doneRecipe = { id: uuid(), ingredients: recipe };
+            let removed = recepts.filter((el) => {
+                return (el.ingredients).join(',') !== (doneRecipe.ingredients).join(',')
+            });
+
+            if (recipeCount !== removed.length) { scoreAdd(scorePlus) }
+
             getRecipeCount(removed.length);
             setRecepts([].concat(removed))
         }
     }, [recipe])
 
-    const RecipeList = recepts && recepts.map((el, i) =>
-    (
-        <RecipeCard key={i.toString()}>
-            {(el['id'] || []).map((val, j) => {
-                return (
-                    <OrderImage
-                        key={j.toString()}
-                        src={recipeImg[val.toString()]}
-                    />
-                );
-            })}
-        </RecipeCard>
-    ));
+
+    const RecipeList = recepts && recepts.map((el, i) => {
+        return (
+            <CSSTransition
+                key={el.id}
+                timeout={500}
+                classNames="recipe-card"
+            >
+                <RecipeCard key={i.toString()}>
+                    {(el['ingredients']).map((val, j) => {
+                        return (
+                            <OrderImage
+                                key={j.toString()}
+                                src={recipeImg[val.toString()]}
+                            />
+                        );
+                    })}
+                </RecipeCard>
+            </CSSTransition>
+        )
+    }
+    );
 
     return (
         <RecipeWrapper>
             <Curtain />
             <RecipeCardWrapper>
-                {RecipeList}
+                <TransitionGroup className="recipe-card-list">
+                    {RecipeList}
+                </TransitionGroup>
             </RecipeCardWrapper>
         </RecipeWrapper>
     );

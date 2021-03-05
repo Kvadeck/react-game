@@ -75,6 +75,26 @@ export const GlobalStyle = createGlobalStyle`
     z-index: 1000;
   }
 
+  .recipe-card-list {
+    display:flex;
+  }
+
+  .recipe-card-enter {
+    opacity: 0;
+  }
+  .recipe-card-enter-active {
+    opacity: 1;
+    transition: opacity 500ms ease-in;
+  }
+  
+  .recipe-card-exit {
+    opacity: 1;
+  }
+  .recipe-card-exit-active {
+    opacity: 0;
+    transition: opacity 500ms ease-in;
+  }
+
   @keyframes right {
     0% {
       -webkit-transform: rotate(0deg);

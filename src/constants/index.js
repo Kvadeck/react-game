@@ -28,6 +28,7 @@ import FailBtn from '../assets/expresso/buttons/orderFail.png';
 
 export const failTime = 1500;
 export const scorePlus = 120;
+export const maxOrders = 4;
 
 
 export const recipeEndConfirm = 'К сожалению на сегодня рецептов больше нет. (демо)';

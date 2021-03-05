@@ -7,7 +7,7 @@ import Hud from './hud/index'
 import React from 'react';
 import { getAllElementsWithAttribute, findActiveCup, stopPlay, storeAudio } from '../helpers/index'
 import Sound from 'react-sound';
-import { sound } from '../constants/index'
+import { sound, maxOrders } from '../constants/index'
 
 const Main = styled.div`
     display:flex;
@@ -21,7 +21,7 @@ function App() {
 
   const [ingCollection, setIngCollection] = React.useState([[], [], []]);
   const [recipe, setRecipe] = React.useState([]);
-  const [recipeCount, setRecipeCount] = React.useState(4);
+  const [recipeCount, setRecipeCount] = React.useState(maxOrders);
   const [score, setScore] = React.useState(0);
   const [playing, setPlaying] = React.useState(false);
 
@@ -59,18 +59,6 @@ function App() {
     setIngCollection([].concat(ingCollection));
   }
   const toggleAmbienceSoundHandle = () => setPlaying(!playing);
-
-  function getRecipeHandle(recipe) {
-    setRecipe([].concat(recipe));
-  }
-
-  function getRecipeCountHandle(count) {
-    setRecipeCount(count);
-  }
-
-  function scoreAddHandle(count) {
-    setScore(score + count);
-  }
 
   function getRecipeHandle(recipe) {
     setRecipe([].concat(recipe));

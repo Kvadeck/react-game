@@ -69,21 +69,6 @@ export function buttonStateSwitcher(dataset) {
     }
 }
 
-export function removeReciept(recipts, doneRecipt) {
-    const updatedReciepts = [];
-
-    recipts.forEach((el) => {
-        const recipeEl = el['id'].join(',');
-        const doneRecipeEl = doneRecipt.join(',');
-
-        if (recipeEl !== doneRecipeEl) {
-            updatedReciepts.push({ id: recipeEl.split(',') })
-        }
-        return;
-    });
-    return updatedReciepts;
-}
-
 export function shuffle(arr) {
     return arr.sort( () => Math.random() - 0.5);
 }
