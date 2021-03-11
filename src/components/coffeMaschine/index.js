@@ -3,8 +3,9 @@ import styled from 'styled-components';
 import React from 'react';
 import { clearArray, buttonIconSwitcher, getAllElementsWithAttribute, coffeeBrewAudio, stopPlay, buttonStateSwitcher } from '../../helpers/index'
 import Handle from '../../assets/expresso/handle/handle.png';
-import { cups, sound, cupIngredients } from '../../constants/index'
+import { cups, sound, cupIngredients, cookingState, active, cupsIds, ingCupIds, buttonsIds, timerIds } from '../../constants/index'
 import Timer from '../timer/index'
+
 
 const CoffeMaschineWrapper = styled.div`
     display: flex;
@@ -113,11 +114,11 @@ const IngredientCup = styled.img`
 
 const brewSounds = new Array(3).fill(false);
 
-    // TODO: Баг. Кнопка меняется на sucess, хотя в cooking стоит fail.     
-    // Происходит при переключении по таймеру на fail.
-    // ["sucess", "sucess", "fail"] "buttons"
-    // ["sucess", "fail", "fail"] "buttons"
-    // ["fail", "sucess", "fail"] "buttons"
+// TODO: Баг. Кнопка меняется на sucess, хотя в cooking стоит fail.     
+// Происходит при переключении по таймеру на fail.
+// ["sucess", "sucess", "fail"] "buttons"
+// ["sucess", "fail", "fail"] "buttons"
+// ["fail", "sucess", "fail"] "buttons"
 
 function CoffeMaschine({ ingCollection, getRecipe }) {
 
@@ -137,36 +138,41 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
     let coffeeStart = new Audio(sound.coffeeStart);
     let answerCorrect = new Audio(sound.answerCorrect);
 
-    const changeButtons = React.useCallback(() => {
-
-        const buttonsState = [];
-        const cookingState = [];
-
-        const cookingDataset = getAllElementsWithAttribute('data-cooking');
-
-        cookingDataset.forEach((el, i) => {
-            cookingState.push((ingCupCollection[i].length && el.dataset.cooking !== 'ready' && el.dataset.cooking !== 'fail') ? 'active' : el.dataset.cooking)
-        })
-
-        cookingState.forEach((el) => {
-            buttonsState.push(buttonStateSwitcher(el));
-        })
-
-        setIngCupCollection([].concat(ingCupCollection));
-
-        return buttonsState;
-    }, [ingCupCollection])
 
     React.useEffect(() => {
+
+        function changeButtons() {
+
+            const cookingDataset = getAllElementsWithAttribute('data-cooking');
+            const { fail, ready } = cookingState;
+
+            setIngCupCollection([].concat(ingCupCollection));
+
+            return cookingDataset
+                .reduce((prev, curr, i) => {
+                    prev.push((ingCupCollection[i].length && curr.dataset.cooking !== ready && curr.dataset.cooking !== fail) ? active : curr.dataset.cooking)
+                    return prev;
+                }, [])
+                .reduce((prev, curr) => {
+                    prev.push(buttonStateSwitcher(curr))
+                    return prev;
+                }, [])
+        }
+
         setButtons([].concat(changeButtons()))
         setIngCupCollection(ingCollection);
-    }, [ingCollection, changeButtons])
+    }, [ingCollection, ingCupCollection])
 
     function handleClickCup({ target }) {
         const index = target.dataset.index;
 
-        if (cups[index] !== true) { selectCup.play() }
-        if (audioLocalState === 'off') { stopPlay(selectCup); }
+        if (cups[index] !== true) {
+            selectCup.play()
+        }
+
+        if (audioLocalState === 'off') {
+            stopPlay(selectCup);
+        }
 
         (function () {
             const pureCups = new Array(3).fill(false);
@@ -175,31 +181,34 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
         })();
     }
 
-    function makeCoffee({ target }) {
-        const buttonIdx = target.dataset.index;
+    function makeCoffee() {
+        return function ({ target }) {
+            const buttonIdx = target.dataset.index;
 
-        buttons[buttonIdx] = 'sucess';
+            buttons[buttonIdx] = 'sucess';
 
-        const audioBrew = coffeeBrewAudio(buttonIdx);
-        brewSounds[buttonIdx] = audioBrew;
+            const audioBrew = coffeeBrewAudio(buttonIdx);
+            brewSounds[buttonIdx] = audioBrew;
 
-        if (audioLocalState === 'off') {
-            stopPlay(coffeeStart)
-            stopPlay(audioBrew)
-        } else {
-            coffeeStart.play();
-            audioBrew.play();
+            if (audioLocalState === 'off') {
+                stopPlay(coffeeStart)
+                stopPlay(audioBrew)
+            } else {
+                coffeeStart.play();
+                audioBrew.play();
+            }
+
+            cooking[buttonIdx] = 'ready';
+            setCooking([].concat(cooking))
+
+            timer[buttonIdx] = 'block'
+            scoreClick[buttonIdx] = true;
+
+            setScoreClick([].concat(scoreClick));
+            setButtons([].concat(buttons))
+            setTimer([].concat(timer));
         }
 
-        cooking[buttonIdx] = 'ready';
-        setCooking([].concat(cooking))
-
-        timer[buttonIdx] = 'block'
-        scoreClick[buttonIdx] = true;
-
-        setScoreClick([].concat(scoreClick));
-        setButtons([].concat(buttons))
-        setTimer([].concat(timer));
     }
 
     function scoreHandle(e) {
@@ -217,8 +226,8 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
             timeout[buttonIdx] = false
             setTimeout([].concat(timeout))
         }
-        
-        function muteAudioScore(audioObj ) {
+
+        function muteAudioScore(audioObj) {
             if (audioLocalState === 'off') {
                 stopPlay(audioObj)
             } else {
@@ -250,7 +259,12 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
     }
 
     function resetCup(idx) {
-        clearArray(ingCupCollection, idx);
+        
+        const cleared = [...ingCupCollection.slice(0, idx), ...ingCupCollection.slice(idx + 1)]
+        console.log(cleared);
+        
+        ingCupCollection[idx] = [];
+        setIngCupCollection([].concat(ingCupCollection))
 
         cooking[idx] = 'start';
         setCooking([].concat(cooking))
@@ -291,7 +305,7 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
             data-index={i}
             data-active={el}
             data-cooking={cooking[i]}
-            key={i.toString()}
+            key={cupsIds[i].id}
             selected={(el) ? true : false}
             onClick={(e) => handleClickCup(e)}
         >
@@ -299,13 +313,12 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
                 {ingCupCollection[i].map((val, j) => {
                     return (
                         <IngredientCup
-                            key={j.toString()}
+                            key={ingCupIds[j].id}
                             src={cupIngredients[val]}
                         />
                     );
                 })}
             </IngredientInner>
-
         </CupsItem>
     ))
 
@@ -313,14 +326,14 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
 
         <CoffeMaschineButton
             data-index={i}
-            onClick={(el === 'start') ? (e) => makeCoffee(e) : () => () => ''}
-            key={i.toString()}
+            onClick={(el === 'start') ? makeCoffee() : () => ''}
+            key={buttonsIds[i].id}
             buttonIcon={buttonIconSwitcher(el)}
         >
 
             <Timer
                 index={i}
-                key={i.toString()}
+                key={timerIds[i].id}
                 fail={failCupHandle}
                 animation={scoreClick[i]}
                 score={(scoreClick[i]) ? () => scoreHandle : () => () => ''}

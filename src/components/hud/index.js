@@ -188,7 +188,9 @@ Hud.propTypes = {
     recipeCount: PropTypes.number,
     score: PropTypes.number,
     toggleAmbienceSound: PropTypes.func,
-    playing: PropTypes.bool
+    playing: PropTypes.bool,
+    soundSwitch: PropTypes.func,
+    allSound: PropTypes.bool
 }
 
 export default Hud;

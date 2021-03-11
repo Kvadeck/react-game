@@ -7,7 +7,7 @@ import Hud from './hud/index'
 import React from 'react';
 import { getAllElementsWithAttribute, findActiveCup, stopPlay, storeAudio } from '../helpers/index'
 import Sound from 'react-sound';
-import { sound, maxOrders } from '../constants/index'
+import { sound, maxOrders, storage, cookingState } from '../constants/index'
 
 const Main = styled.div`
     display:flex;
@@ -25,8 +25,8 @@ function App() {
   const [score, setScore] = React.useState(0);
   const [playing, setPlaying] = React.useState(false);
 
-  let ingredientClick = new Audio(sound.ingredientClick);
-  let audioLocalState = localStorage.getItem('audio') || 'off';
+  const ingredientClick = new Audio(sound.ingredientClick);
+  const audioLocalState = localStorage.getItem(storage.item) || storage.off;
 
   const [allSound, setAllSound] = React.useState((audioLocalState === 'off') ? true : false);
 
@@ -35,30 +35,34 @@ function App() {
     setAllSound(!allSound);
   }
 
-  function addIngredientHandle({ target }) {
+  function addIngredientHandle() {
+    return function ({ target }) {
+      const ingName = target.id;
 
-    const ingName = target.id;
+      const cupsActive = getAllElementsWithAttribute('data-active');
+      const activeCupIdx = findActiveCup(cupsActive);
 
-    const cupsActive = getAllElementsWithAttribute('data-active');
-    const activeCupIdx = findActiveCup(cupsActive);
+      const isCooking = cupsActive[activeCupIdx].dataset.cooking;
 
-    const isCooking = cupsActive[activeCupIdx].dataset.cooking;
+      if (ingCollection[activeCupIdx].length > 1
+        || isCooking === cookingState.ready || isCooking === cookingState.done || isCooking === cookingState.fail) {
+        return;
+      } else {
+        ingCollection[activeCupIdx].push(ingName);
+      }
 
-    if (ingCollection[activeCupIdx].length > 1
-      || isCooking === 'ready' || isCooking === 'done' || isCooking === 'fail') {
-      return;
-    } else {
-      ingCollection[activeCupIdx].push(ingName);
+      if (audioLocalState === 'off') {
+        stopPlay(ingredientClick)
+      } else {
+        ingredientClick.play();
+      }
+      setIngCollection([].concat(ingCollection));
     }
-
-    if (audioLocalState === 'off') {
-      stopPlay(ingredientClick)
-    } else {
-      ingredientClick.play();
-    }
-    setIngCollection([].concat(ingCollection));
   }
-  const toggleAmbienceSoundHandle = () => setPlaying(!playing);
+
+  function toggleAmbienceSoundHandle() {
+    setPlaying(!playing)
+  };
 
   function getRecipeHandle(recipe) {
     setRecipe([].concat(recipe));
@@ -88,7 +92,7 @@ function App() {
           toggleAmbienceSound={toggleAmbienceSoundHandle}
           score={score}
           recipeCount={recipeCount}
-          soundSwitch = {soundSwitchHandle}
+          soundSwitch={soundSwitchHandle}
         />
         <Recipe
           recipe={recipe}
@@ -101,7 +105,7 @@ function App() {
           getRecipe={getRecipeHandle}
           ingCollection={ingCollection}
         />
-        <Ingredients addIngredient={() => addIngredientHandle} />
+        <Ingredients addIngredient={addIngredientHandle} />
       </Inner>
 
     </Main>

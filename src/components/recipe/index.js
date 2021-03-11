@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import BarEnd from '../../assets/recipe/barEnds.png';
 import RecipeBack from '../../assets/recipe/orderReceipt.png'
-import { recipeImg, scorePlus } from '../../constants/index'
+import { recipeImg, scorePlus, transitionDelay } from '../../constants/index'
 import React from 'react';
 import { shuffle } from '../../helpers/index'
 import { v4 as uuid } from 'uuid'
@@ -114,7 +114,7 @@ function Recipe({ recipe, getRecipeCount, scoreAdd, recipeCount }) {
         return (
             <CSSTransition
                 key={el.id}
-                timeout={500}
+                timeout={transitionDelay}
                 classNames="recipe-card"
             >
                 <RecipeCard key={i.toString()}>

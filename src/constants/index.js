@@ -1,3 +1,5 @@
+import { v4 as uuid } from 'uuid'
+
 import Chocolate from '../assets/ingredients/jarIngredients/ChocolateIcon.png';
 import Cinnamon from '../assets/ingredients/jarIngredients/CinnamonIcon.png';
 import Coffee from '../assets/ingredients/jarIngredients/Coffee.png';
@@ -29,7 +31,21 @@ import FailBtn from '../assets/expresso/buttons/orderFail.png';
 export const failTime = 1500;
 export const scorePlus = 120;
 export const maxOrders = 4;
+export const transitionDelay = 500;
 
+export const storage = {
+    item: 'audio',
+    off: 'off',
+    on: 'on',
+}
+
+export const active = 'active';
+
+export const cookingState = {
+    ready:'ready',
+    done:'done',
+    fail:'fail',
+}
 
 export const recipeEndConfirm = 'К сожалению на сегодня рецептов больше нет. (демо)';
 
@@ -91,3 +107,27 @@ export const coffeeButtons = {
     'sucess': SucessBtn,
     'fail': FailBtn,
 }
+
+export const cupsIds = [
+    { id: uuid() },
+    { id: uuid() },
+    { id: uuid() },
+]
+
+export const ingCupIds = [
+    { id: uuid() },
+    { id: uuid() },
+    { id: uuid() },
+]
+
+export const buttonsIds = [
+    { id: uuid() },
+    { id: uuid() },
+    { id: uuid() },
+]
+
+export const timerIds = [
+    { id: uuid() },
+    { id: uuid() },
+    { id: uuid() },
+]

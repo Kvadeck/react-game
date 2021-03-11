@@ -2,12 +2,6 @@ import { sound } from '../constants/index'
 
 import { coffeeButtons } from '../constants/index'
 
-export function clearArray(arr = [], index = 0) {
-    while (arr[index].length > 0) {
-        arr[index].pop();
-    }
-}
-
 export function buttonIconSwitcher(iconName) {
     switch (iconName) {
         case 'enabled':
@@ -26,9 +20,9 @@ export function buttonIconSwitcher(iconName) {
 }
 
 export function getAllElementsWithAttribute(attribute) {
-    var matchingElements = [];
-    var allElements = document.getElementsByTagName('*');
-    for (var i = 0, n = allElements.length; i < n; i++) {
+    let matchingElements = [];
+    let allElements = document.getElementsByTagName('*');
+    for (let i = 0, n = allElements.length; i < n; i++) {
         if (allElements[i].getAttribute(attribute) !== null) {
             matchingElements.push(allElements[i]);
         }
