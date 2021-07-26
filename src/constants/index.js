@@ -81,7 +81,7 @@ export const cupIngredients = {
     'sugar': sugarIngredient,
 }
 
-export const IngredientCustoms = [
+export const IngredientList = [
     { id: 'cinnamon', src: ingredients['cinnamon'], width: '45px', top: '35px', height: '54px' },
     { id: 'cream', src: ingredients['milk'], width: '45px', top: '27px', height: '61px' },
     { id: 'chocolate', src: ingredients['chocolate'], width: '50px', top: '45px', height: '41px' },

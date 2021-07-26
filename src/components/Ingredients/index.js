@@ -1,28 +1,29 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import JarEmpty from '../../assets/ingredients/JarEmpty.png';
-import { IngredientCustoms } from '../../constants/index'
-import Footer from '../footer';
+import { IngredientList } from '../../constants/index'
+
+// !TODO: Переделать изображения с помощью спрайта и разного позиционирование
+// !TODO: Сделать клик по банке вместо самого ингридиента
+// !TODO: Добавить какой нибудь ховер эффект(при наведение ингредиент смещается вверх и вниз)
 
 const IngredientsWrapper = styled.div`
     display: flex;
-    justify-content: space-between;
     position: relative;
     width: 100%;
-    flex-direction: column;
     align-items: flex-start;
-    min-height: 250px;
+    height: 250px;
     background-color: var(--background-ingredients-color);
     border-top: 15px solid var(--border-ingredients-color);
     padding: 0 15px;
 `;
 const JarWrapper = styled.div`
     display: flex;
+    padding: 5px;
     justify-content: center;
     position: relative;
     width: 100%;
     align-items: center;
-    min-height: 100px;
     background-color: var(--background-jar-color);
 `;
 const EmptyJar = styled.div`
@@ -32,28 +33,34 @@ const EmptyJar = styled.div`
     width: 91px;
     height: 105px;
     background-image: url(${JarEmpty});
-`;
+    cursor: pointer;
+    &:hover {
+        img {
+            animation-play-state: running;    
+        }
+    }
+    `;
+
 const IngredientImage = styled.img`
-    width: ${({ iconWidth }) => iconWidth || "50px"};
-    top: ${({ iconTop }) => iconTop || "45px"};
-    height: ${({ iconHeight }) => iconHeight || "41px"};
     position: absolute;
     cursor: pointer;
+    top: ${({ top }) => top};
+    width: ${({ width }) => width};
+    height: ${({ height }) => height};
+    animation: upDown .8s infinite;
+    animation-play-state: paused;
 `;
 
 function Ingredients({ addIngredient }) {
 
-    const IngredientList = IngredientCustoms.map((el, i) =>
+    const JarList = IngredientList.map((el) =>
     (
-        <EmptyJar key={i.toString()}>
+        <EmptyJar onClick={addIngredient()} id={el.id} key={el.id}>
             <IngredientImage
-                id={el.id}
                 src={el.src}
-                key={i.toString()}
-                onClick={addIngredient()}
-                iconWidth={el.width}
-                iconTop={el.top}
-                iconHeight={el.height}
+                top={el.top}
+                width={el.width}
+                height={el.height}
             />
         </EmptyJar>
     ))
@@ -61,15 +68,14 @@ function Ingredients({ addIngredient }) {
     return (
         <IngredientsWrapper>
             <JarWrapper>
-                {IngredientList}
+                {JarList}
             </JarWrapper>
-            <Footer/>
         </IngredientsWrapper>
     );
 }
 
 Ingredients.propTypes = {
-    getIngredientName: PropTypes.func,
+    addIngredient: PropTypes.func,
 }
 
 export default Ingredients;

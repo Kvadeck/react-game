@@ -1,13 +1,15 @@
-import styled from 'styled-components';
-import Inner from './blocks/Inner'
-import Ingredients from './ingredients/index'
-import CoffeMaschine from './coffeMaschine/index'
-import Recipe from './recipe/index'
-import Hud from './hud/index'
 import React from 'react';
-import { getAllElementsWithAttribute, findActiveCup, stopPlay, storeAudio } from '../helpers/index'
+import styled from 'styled-components';
+
+import Inner from './Blocks/Inner'
+import Ingredients from './Ingredients'
+import CoffeMaschine from './CoffeMaschine'
+import Recipe from './Recipe'
+import Hud from './HUD'
+import { getAllElementsWithAttribute, stopPlay, storeAudio } from '../helpers'
 import Sound from 'react-sound';
-import { sound, maxOrders, storage, cookingState } from '../constants/index'
+import { sound, maxOrders, storage, cookingState } from '../constants'
+import { findIndex } from 'lodash'
 
 const Main = styled.div`
     display:flex;
@@ -20,6 +22,8 @@ window.soundManager.setup({ debugMode: false });
 function App() {
 
   const [ingCollection, setIngCollection] = React.useState([[], [], []]);
+  const [cups, setCups] = React.useState([true, false, false]);
+
   const [recipe, setRecipe] = React.useState([]);
   const [recipeCount, setRecipeCount] = React.useState(maxOrders);
   const [score, setScore] = React.useState(0);
@@ -35,20 +39,27 @@ function App() {
     setAllSound(!allSound);
   }
 
+  // TODO: Отказаться от поиска в dom активных стаканов
+
   function addIngredientHandle() {
     return function ({ target }) {
-      const ingName = target.id;
 
-      const cupsActive = getAllElementsWithAttribute('data-active');
-      const activeCupIdx = findActiveCup(cupsActive);
+      var t0 = performance.now()
+      const cupsActive = getAllElementsWithAttribute('data-cooking');
+      var t1 = performance.now()
+      console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.")
 
+      const activeCupIdx = findIndex(cups, function(el) { return el === true })
+
+      const ingredientIdx = (target.id === '') ? target.parentNode.id : target.id
+      
       const isCooking = cupsActive[activeCupIdx].dataset.cooking;
 
       if (ingCollection[activeCupIdx].length > 1
         || isCooking === cookingState.ready || isCooking === cookingState.done || isCooking === cookingState.fail) {
-        return;
+        return
       } else {
-        ingCollection[activeCupIdx].push(ingName);
+        ingCollection[activeCupIdx].push(ingredientIdx);
       }
 
       if (audioLocalState === 'off') {
@@ -102,6 +113,8 @@ function App() {
         />
 
         <CoffeMaschine
+          cups={cups}
+          setCups={setCups}
           getRecipe={getRecipeHandle}
           ingCollection={ingCollection}
         />

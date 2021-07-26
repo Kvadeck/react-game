@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import React from 'react';
-import { clearArray, buttonIconSwitcher, getAllElementsWithAttribute, coffeeBrewAudio, stopPlay, buttonStateSwitcher } from '../../helpers/index'
+import { buttonIconSwitcher, getAllElementsWithAttribute, coffeeBrewAudio, stopPlay, buttonStateSwitcher } from '../../helpers/index'
 import Handle from '../../assets/expresso/handle/handle.png';
 import { cups, sound, cupIngredients, cookingState, active, cupsIds, ingCupIds, buttonsIds, timerIds } from '../../constants/index'
-import Timer from '../timer/index'
+import Timer from '../Timer/index'
 
 
 const CoffeMaschineWrapper = styled.div`
@@ -31,7 +31,6 @@ const CoffeMaschineCupsInner = styled.div`
     width: 100%;
     border-radius: 2px 2px 0 0;
     min-height: 190px;
-    
     z-index: 1;
     justify-content: flex-end;
     flex-direction: column;
@@ -120,9 +119,8 @@ const brewSounds = new Array(3).fill(false);
 // ["sucess", "fail", "fail"] "buttons"
 // ["fail", "sucess", "fail"] "buttons"
 
-function CoffeMaschine({ ingCollection, getRecipe }) {
+function CoffeMaschine({ ingCollection, getRecipe, cups, setCups }) {
 
-    const [cups, setCups] = React.useState([true, false, false]);
     const [buttons, setButtons] = React.useState(['disabled', 'disabled', 'disabled']);
     const [timer, setTimer] = React.useState(['none', 'none', 'none']);
     const [scoreClick, setScoreClick] = React.useState([false, false, false]);
@@ -303,7 +301,6 @@ function CoffeMaschine({ ingCollection, getRecipe }) {
     (
         <CupsItem
             data-index={i}
-            data-active={el}
             data-cooking={cooking[i]}
             key={cupsIds[i].id}
             selected={(el) ? true : false}

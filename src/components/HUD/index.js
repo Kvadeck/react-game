@@ -36,7 +36,7 @@ const HudText = styled.span`
   position: relative;
   text-transform: uppercase;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 `;
 
 const ModalButtonWrapper = styled.div`

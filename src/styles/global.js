@@ -1,12 +1,14 @@
 import { createGlobalStyle } from 'styled-components'
 import { normalize } from 'styled-normalize'
-
+import Rotonda from '../fonts/RotondaC-Bold.ttf'
 
 export const GlobalStyle = createGlobalStyle`
   ${normalize}
 
-  @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;400;600;700;900&display=swap');
-
+  @font-face {
+    font-family: 'Rotonda Bold';
+    src: url(${Rotonda});
+  }
 
   * {
     margin: 0;
@@ -20,7 +22,6 @@ export const GlobalStyle = createGlobalStyle`
     --background-ingredients-color: #7f3630;
     --border-ingredients-color: #74312b;
     --background-jar-color: #352822;
-
     
     --border-bottom-coffemaschinecupsouter-color: #349199;
     --border-bottom-coffemaschinecupsinner-color: #50a8b2;
@@ -38,7 +39,7 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    font-family: 'Source Sans Pro', sans-serif;
+    font-family: 'Rotonda Bold', sans-serif;
     padding: 0;
     background-color: var(--background-color);
 
@@ -46,11 +47,9 @@ export const GlobalStyle = createGlobalStyle`
 
     display: flex;
     flex-direction: column;
-    min-height: 100%;
-    height: auto;
+    height: 100%;
     color: black;
     font-size: 1em;
-    -webkit-font-smoothing: antialiased;
   }
 
   ul {
@@ -65,13 +64,14 @@ export const GlobalStyle = createGlobalStyle`
     background: white;
     opacity: .4;
   }
+  
   .menu-dropdown-link {
     font-size: 1.2rem;
   }
 
   .overlay {
     position: fixed;
-    inset: 0px;
+    inset: 0;
     z-index: 1000;
   }
 
@@ -82,6 +82,7 @@ export const GlobalStyle = createGlobalStyle`
   .recipe-card-enter {
     opacity: 0;
   }
+
   .recipe-card-enter-active {
     opacity: 1;
     transition: opacity 500ms ease-in;
@@ -90,6 +91,7 @@ export const GlobalStyle = createGlobalStyle`
   .recipe-card-exit {
     opacity: 1;
   }
+
   .recipe-card-exit-active {
     opacity: 0;
     transition: opacity 500ms ease-in;
@@ -103,6 +105,7 @@ export const GlobalStyle = createGlobalStyle`
       transform: rotate(180deg);
     }
   }
+
   @keyframes left { 
     0% {
       -webkit-transform: rotate(0deg);
@@ -111,4 +114,19 @@ export const GlobalStyle = createGlobalStyle`
       transform: rotate(180deg);
     }
   }
+
+  @keyframes upDown {
+	0% {
+		transform: translateY(0);
+	}
+
+	50% {
+		transform: translateY(-5px);
+	}
+
+	100% {
+		transform: translateY(0);
+	}
+}
+
 `
