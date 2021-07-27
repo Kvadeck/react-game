@@ -3,7 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import Modal from 'react-modal';
-import { recipeEndConfirm, helpText, modalImg } from '../../constants/index'
+import { sound, recipeEndConfirm, helpText, audioLocalState, modalImg } from '../../constants/index'
+import Sound from 'react-sound';
 
 Modal.setAppElement('#root')
 
@@ -72,13 +73,7 @@ const ModalButtonCloseImg = styled.img`
     height: 20px;
 `;
 
-// TODO: Отказаться от библиотек с выпадающим списком и модальным окном
-// TODO: Сделать переключение нескольких языков
-// TODO: Поменять дизайн. Сгрупировать все опции в отдельное открывающиеся окно
-// TODO: Добавить ховер эффект у элементов HUD
-// TODO: Стилизовать модальное окно для подтверждения
-
-function HUD({ recipeCount, score }) {
+function Options({ recipeCount, score }) {
 
     const [fullscreen, setFullscreen] = React.useState(true)
     const [modalIsOpen, setIsOpen] = React.useState(true)
@@ -91,22 +86,6 @@ function HUD({ recipeCount, score }) {
     //     return setSoundFX(!soundFX)
     // }
 
-    const modalStyles = {
-        content: {
-            width: '100%',
-            height: 'fit-content',
-            margin: '0 auto',
-        }
-    };
-
-    
-
-    React.useEffect(() => {
-        if (!recipeCount) {
-            confirm(recipeEndConfirm);
-            document.location.reload();
-        }
-    }, [recipeCount])
 
     // const toggleFullScreenHandle = () => {
     //     setFullscreen(!fullscreen)
@@ -184,7 +163,6 @@ function HUD({ recipeCount, score }) {
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={() => setIsOpen(false)}
-                style={modalStyles}
                 overlayClassName='overlay'
             >
                 <ModalButtonWrapper>
@@ -204,9 +182,9 @@ function HUD({ recipeCount, score }) {
     );
 }
 
-HUD.propTypes = {
+Options.propTypes = {
     recipeCount: PropTypes.number,
     score: PropTypes.number,
 }
 
-export default HUD;
+export default Options;

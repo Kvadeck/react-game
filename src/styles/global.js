@@ -1,12 +1,17 @@
 import { createGlobalStyle } from 'styled-components'
 import { normalize } from 'styled-normalize'
-import Rotonda from '../fonts/RotondaC-Bold.ttf'
+import Rotonda from '../fonts/RotondaC.ttf'
+import RotondaBold from '../fonts/RotondaC-Bold.ttf'
 
 export const GlobalStyle = createGlobalStyle`
   ${normalize}
 
   @font-face {
     font-family: 'Rotonda Bold';
+    src: url(${RotondaBold});
+  }
+  @font-face {
+    font-family: 'Rotonda Regular';
     src: url(${Rotonda});
   }
 
@@ -99,7 +104,7 @@ export const GlobalStyle = createGlobalStyle`
 
   @keyframes right {
     0% {
-      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
     }
     100% {
       transform: rotate(180deg);
@@ -108,7 +113,7 @@ export const GlobalStyle = createGlobalStyle`
 
   @keyframes left { 
     0% {
-      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
     }
     100% {
       transform: rotate(180deg);

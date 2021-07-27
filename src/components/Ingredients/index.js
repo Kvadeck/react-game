@@ -3,9 +3,8 @@ import styled from 'styled-components';
 import JarEmpty from '../../assets/ingredients/JarEmpty.png';
 import { IngredientList } from '../../constants/index'
 
-// !TODO: Переделать изображения с помощью спрайта и разного позиционирование
 // !TODO: Сделать клик по банке вместо самого ингридиента
-// !TODO: Добавить какой нибудь ховер эффект(при наведение ингредиент смещается вверх и вниз)
+// !TODO: Добавить какой нибудь ховер эффект(при наведение на банку ингредиент передвигается вверх и вниз)
 
 const IngredientsWrapper = styled.div`
     display: flex;
@@ -40,7 +39,6 @@ const EmptyJar = styled.div`
         }
     }
     `;
-
 const IngredientImage = styled.img`
     position: absolute;
     cursor: pointer;
@@ -49,6 +47,7 @@ const IngredientImage = styled.img`
     height: ${({ height }) => height};
     animation: upDown .8s infinite;
     animation-play-state: paused;
+    user-select: none;
 `;
 
 function Ingredients({ addIngredient }) {

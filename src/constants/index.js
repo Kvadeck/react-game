@@ -6,7 +6,6 @@ import Coffee from '../assets/ingredients/jarIngredients/Coffee.png';
 import Cream from '../assets/ingredients/jarIngredients/CreamIcon.png';
 import Sugar from '../assets/ingredients/jarIngredients/Sugar.png';
 
-
 import chocolateOrder from '../assets/recipe/orderIngredients/chocolateOrder.png'
 import cinnamonOrder from '../assets/recipe/orderIngredients/cinnamonOrder.png'
 import creamerOrder from '../assets/recipe/orderIngredients/creamerOrder.png'
@@ -28,6 +27,9 @@ import StartServeBtn from '../assets/expresso/buttons/startServe.png';
 import SucessBtn from '../assets/expresso/buttons/serveSuccess.png';
 import FailBtn from '../assets/expresso/buttons/orderFail.png';
 
+import MaschineImage from '../assets/help.jpg';
+import CrossImage from '../assets/cross.png';
+
 export const failTime = 1500;
 export const scorePlus = 120;
 export const maxOrders = 4;
@@ -39,12 +41,14 @@ export const storage = {
     on: 'on',
 }
 
+export const audioLocalState = localStorage.getItem(storage.item) || storage.off
+
 export const active = 'active';
 
 export const cookingState = {
-    ready:'ready',
-    done:'done',
-    fail:'fail',
+    ready: 'ready',
+    done: 'done',
+    fail: 'fail',
 }
 
 export const recipeEndConfirm = 'К сожалению на сегодня рецептов больше нет. (демо)';
@@ -99,6 +103,10 @@ export const sound = {
     guitarRadioAmbienceLoop: '/sound/guitarRadioAmbienceLoop.mp3'
 }
 
+export const modalImg = {
+    'MaschineImg': MaschineImage,
+    'CrossImg': CrossImage
+}
 
 export const coffeeButtons = {
     'enabled': ServeEnabledBtn,

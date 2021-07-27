@@ -30,13 +30,6 @@ export function getAllElementsWithAttribute(attribute) {
     return matchingElements;
 }
 
-export function findActiveCup(cups) {
-    const activedCup = []
-    cups.forEach((cup) => { activedCup.push(cup.dataset.active); })
-    const cupIdx = activedCup.indexOf('true');
-    return cupIdx;
-}
-
 export function coffeeBrewAudio(audioIdx) {
     audioIdx = new Audio(sound.coffeeBrew);
     return audioIdx;
@@ -65,8 +58,4 @@ export function buttonStateSwitcher(dataset) {
 
 export function shuffle(arr) {
     return arr.sort( () => Math.random() - 0.5);
-}
-
-export function storeAudio(state) {
-    localStorage.setItem('audio', (state) ? 'off' : 'on');
 }
