@@ -2,18 +2,78 @@
 import React from 'react';
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
-import Modal from 'react-modal';
 import { sound, recipeEndConfirm, helpText, audioLocalState, modalImg } from '../../constants/index'
-import Sound from 'react-sound';
+import bgImage from '../../assets/optionsBg.png'
+import CrossImg from '../../assets/cross.png'
 
-Modal.setAppElement('#root')
+const OptionsWrapper = styled.div`  
+    display: flex;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+`;
 
-const HudWrapper = styled.div`
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
+const OptionsOverlay = styled.div`  
+    position: absolute;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    
+    background: black;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity .3s ease-in;
+    visibility: hidden;
+    ${({ active }) => active && `
+        opacity: .4;
+        visibility: visible;
+    `};
+`;
+
+const OptionsModal = styled.div`  
+    width: 500px;
+    height: 500px;
+    background: white;
+    z-index: 101;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    border-radius: 10px;
+    transform: translate(0, -500px);
+    transition: transform .3s .3s linear;
+    ${({ active }) => active && `
+        transform: translate(0, 55px);
+    `};
+`;
+
+const CloseOptions = styled.div`  
+    position: absolute;
+    top: 5px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    opacity: .7;
+    border-radius: 50%;
+    border: 2px solid black;
+    &:hover {
+        span {
+            transform: rotate(180deg);
+        }
+    }
+`;
+
+const Cross = styled.span`  
+    position: absolute;
+    background-image:url(${CrossImg});
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    transition: transform .25s;
 `;
 
 const HudOuter = styled.div`
@@ -22,7 +82,6 @@ const HudOuter = styled.div`
   align-items: center;
   position: relative;
 `;
-
 const HudInner = styled.div`
   display: flex;
   justify-content: space-between;
@@ -73,11 +132,17 @@ const ModalButtonCloseImg = styled.img`
     height: 20px;
 `;
 
-function Options({ recipeCount, score }) {
+// !TODO: Отказаться от библиотек с выпадающим списком и модальным окном
+// TODO: Сделать переключение нескольких языков
+// TODO: Поменять дизайн. Сгрупировать все опции в отдельное открывающиеся окно
 
-    const [fullscreen, setFullscreen] = React.useState(true)
-    const [modalIsOpen, setIsOpen] = React.useState(true)
-    const [playing, setPlaying] = React.useState(false)
+function Options({ toogleModal }) {
+
+    // const [fullscreen, setFullscreen] = React.useState(true)
+    // const [modalIsOpen, setIsOpen] = React.useState(true)
+    // const [playing, setPlaying] = React.useState(false)
+
+    const [modalFlag, setModalFlag] = React.useState(false)
 
     // const [soundFX, setSoundFX] = React.useState((audioLocalState === 'off') ? true : false)
 
@@ -85,7 +150,6 @@ function Options({ recipeCount, score }) {
     //     localStorage.setItem('audio', (!soundFX) ? 'off' : 'on')
     //     return setSoundFX(!soundFX)
     // }
-
 
     // const toggleFullScreenHandle = () => {
     //     setFullscreen(!fullscreen)
@@ -117,74 +181,38 @@ function Options({ recipeCount, score }) {
 
     return (
 
-        <HudWrapper>
+        <OptionsWrapper>
+            <OptionsOverlay active={toogleModal === 'closed' || modalFlag ? false : true } />
 
-            {/* <Sound
-                url={sound.guitarRadioAmbienceLoop}
-                playStatus={(playing) ? Sound.status.PLAYING : Sound.status.STOPPED}
-                loop={true}
-            /> */}
+            <OptionsModal active={toogleModal === 'closed' || modalFlag ? false : true}>
+                    <CloseOptions onClick={setModalFlag(true)}>
+                        <Cross/>
+                    </CloseOptions>
+            </OptionsModal>
 
-            {/* <Dropdown
-                arrowClosed={arrowEmpty}
-                arrowOpen={arrowEmpty}
-                onChange={(option) => dropDownHandle(option)}
-                controlClassName='menu-dropdown-control'
-                menuClassName='menu-dropdown-link'
-                options={dropDownOptions}
-                placeholder="Menu" /> */}
+        </OptionsWrapper>
 
-            {/* <HudOuter cursor={'pointer'} onClick={() => setPlaying(!playing)}>
-                <HudText>Music</HudText>
-                <HudText>{playing ? 'on' : 'off'}</HudText>
-            </HudOuter> */}
+        /* <Sound
+            url={sound.guitarRadioAmbienceLoop}
+            playStatus={(playing) ? Sound.status.PLAYING : Sound.status.STOPPED}
+            loop={true}
+        /> */
 
-            {/* <HudOuter width={'100px'} cursor={'pointer'} onClick={soundFXHandle}>
-                <HudText>Sound</HudText>
-                <HudText>{soundFX ? 'off' : 'on'}</HudText>
-            </HudOuter> */}
+        /* <HudOuter cursor={'pointer'} onClick={() => setPlaying(!playing)}>
+            <HudText>Music</HudText>
+            <HudText>{playing ? 'on' : 'off'}</HudText>
+            </HudOuter> */
 
-            <HudInner cursor='pointer'>
-                <HudText>Menu</HudText>
-            </HudInner>
+        /* <HudOuter width={'100px'} cursor={'pointer'} onClick={soundFXHandle}>
+            <HudText>Sound</HudText>
+            <HudText>{soundFX ? 'off' : 'on'}</HudText>
+        </HudOuter> */
 
-            <HudOuter>
-                <HudInner width={'120px'}>
-                    <HudText>Orders</HudText>
-                    <HudText>{recipeCount}</HudText>
-                </HudInner>
-
-                <HudInner>
-                    <HudText>Score</HudText>
-                    <HudText>{score}</HudText>
-                </HudInner>
-            </HudOuter>
-
-            <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={() => setIsOpen(false)}
-                overlayClassName='overlay'
-            >
-                <ModalButtonWrapper>
-
-                    <ModalButtonClose onClick={() => setIsOpen(false)}>
-                        <ModalButtonCloseImg src={modalImg.CrossImg} />
-                    </ModalButtonClose>
-
-                </ModalButtonWrapper>
-                <MaschineImg src={modalImg.MaschineImg} />
-                <ModalContentWrapper>
-                    {helpText}
-                </ModalContentWrapper>
-            </Modal>
-
-        </HudWrapper>
     );
 }
 
-Options.propTypes = {
-    recipeCount: PropTypes.number,
-    score: PropTypes.number,
-}
+// Options.propTypes = {
+//     toogleModal: PropTypes.object,
+// }
 
 export default Options;

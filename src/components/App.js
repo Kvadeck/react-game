@@ -5,6 +5,7 @@ import Ingredients from './Ingredients'
 import CoffeMaschine from './CoffeMaschine'
 import Recipe from './Recipe'
 import HUD from './HUD'
+import Options from './Options'
 import { sound, maxOrders, storage, cookingState, audioLocalState } from '../constants'
 import { findIndex } from 'lodash'
 
@@ -25,7 +26,7 @@ const Main = styled.div`
     width: 100%;
 `;
 
-window.soundManager.setup({ debugMode: false });
+// window.soundManager.setup({ debugMode: false });
 
 function App() {
 
@@ -38,6 +39,8 @@ function App() {
   const [recipeCount, setRecipeCount] = React.useState(maxOrders)
 
   const [score, setScore] = React.useState(0)
+
+  const [toogleModal, setToogleModal] = React.useState('closed')
 
   const ingredientClick = new Audio(sound.ingredientClick)
   
@@ -78,12 +81,17 @@ function App() {
 
   return (
     <Main>
-
+      <Options 
+        toogleModal={toogleModal}
+      />
       <Inner>
+
         <HUD
           score={score}
           recipeCount={recipeCount}
+          setToogleModal = {() => setToogleModal}
         />
+
         <Recipe
           recipe={recipe}
           getRecipeCount={getRecipeCountHandle}
@@ -97,7 +105,8 @@ function App() {
           getRecipe={getRecipeHandle}
           ingCollection={ingCollection}
         />
-        <Ingredients addIngredient={(e) => addIngredientHandle} />
+
+        <Ingredients addIngredient={() => addIngredientHandle} />
       </Inner>
 
     </Main>
