@@ -30,13 +30,13 @@ const HudInner = styled.div`
   width: ${({ width }) => width || "100px"};
   margin: 0 1px;
   padding: 0 10px;
+  box-shadow: 0 -2px 0 black inset;
 `;
 const HudMenuInner = styled(HudInner)`
   cursor: pointer;
+  transition: box-shadow .1s linear;
   &:hover {
-      span {
-          opacity:1;
-      }
+    box-shadow: initial;
   }
 `;
 
@@ -53,11 +53,6 @@ const HudText = styled.span`
 
 const HudMenuText = styled(HudText)`
   cursor: pointer;
-  &:hover {
-      span {
-          opacity:1;
-      }
-  }
 `;
 
 const HudBean = styled.span`
@@ -68,7 +63,7 @@ const HudBean = styled.span`
     position: absolute;
     top: -1px;
     left: 60px;
-    opacity: 0;
+    opacity: 1;
     transition: opacity .2s ease-in;
     cursor: pointer;
 `;
@@ -76,7 +71,7 @@ const HudBean = styled.span`
 // !TODO: Добавить ховер эффект у элемента меню в HUD
 // TODO: Стилизовать модальное окно для подтверждения
 
-function HUD({ recipeCount, score, setToogleModal }) {
+function HUD({ recipeCount, score, setToogleOptions }) {
 
     React.useEffect(() => {
         if (!recipeCount) {
@@ -87,7 +82,7 @@ function HUD({ recipeCount, score, setToogleModal }) {
 
     return (
         <HudWrapper>
-            <HudMenuInner onClick={setToogleModal(true)}>
+            <HudMenuInner onClick={setToogleOptions(true)}>
                 <HudMenuText>
                     Menu
                     <HudBean></HudBean>
@@ -111,7 +106,7 @@ function HUD({ recipeCount, score, setToogleModal }) {
 HUD.propTypes = {
     recipeCount: PropTypes.number.isRequired,
     score: PropTypes.number.isRequired,
-    setToogleModal: PropTypes.func.isRequired
+    setToogleOptions: PropTypes.func.isRequired
 }
 
 export default HUD;

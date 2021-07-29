@@ -40,56 +40,55 @@ function App() {
 
   const [score, setScore] = React.useState(0)
 
-  const [toogleModal, setToogleModal] = React.useState('closed')
+  const [toogleOptions, setToogleOptions] = React.useState(false)
 
   const ingredientClick = new Audio(sound.ingredientClick)
-  
 
   // !TODO: Отказаться от поиска в dom активных стаканов в функции addIngredientHandle
 
   function addIngredientHandle({ target }) {
 
-      const activeCupIdx = findIndex(cups, (el) => el === true)
-      const ingredientIdx = (target.id === '') ? target.parentNode.id : target.id
-      const isCooking = cookStatus[activeCupIdx]
+    const activeCupIdx = findIndex(cups, (el) => el === true)
+    const ingredientIdx = (target.id === '') ? target.parentNode.id : target.id
+    const isCooking = cookStatus[activeCupIdx]
 
-      // Only two ingredients in one cup
-      if (ingCollection[activeCupIdx].length > 1) return
-      // Add only if status === start
-      else if (isCooking === cookingState.ready || isCooking === cookingState.done || isCooking === cookingState.fail) return
-      
-      if (audioLocalState !== 'off') {
-        ingredientClick.play()
-      }
+    // Only two ingredients in one cup
+    if (ingCollection[activeCupIdx].length > 1) return
+    // Add only if status === start
+    else if (isCooking === cookingState.ready || isCooking === cookingState.done || isCooking === cookingState.fail) return
 
-      ingCollection[activeCupIdx].push(ingredientIdx)
-      return setIngCollection([].concat(ingCollection))
-    
+    if (audioLocalState !== 'off') {
+      ingredientClick.play()
+    }
+
+    ingCollection[activeCupIdx].push(ingredientIdx)
+    return setIngCollection([].concat(ingCollection))
+
   }
 
   function getRecipeHandle(recipe) {
-    setRecipe([].concat(recipe));
+    return setRecipe([].concat(recipe))
   }
-
+  
   function getRecipeCountHandle(count) {
-    setRecipeCount(count);
+    return setRecipeCount(count)
   }
-
+  
   function scoreAddHandle(count) {
-    setScore(score + count);
+    return setScore(score + count)
   }
 
   return (
     <Main>
-      <Options 
-        toogleModal={toogleModal}
+      <Options
+        toogleOptions={toogleOptions}
       />
       <Inner>
 
         <HUD
           score={score}
           recipeCount={recipeCount}
-          setToogleModal = {() => setToogleModal}
+          setToogleOptions = {() => setToogleOptions}
         />
 
         <Recipe

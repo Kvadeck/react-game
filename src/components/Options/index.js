@@ -23,12 +23,14 @@ const OptionsOverlay = styled.div`
     background: black;
     z-index: 100;
     opacity: 0;
-    transition: opacity .3s ease-in;
+    transition: opacity .3s ease-in, visibility .3s linear;
     visibility: hidden;
-    ${({ active }) => active && `
+
+    ${({ flag }) => flag && `
         opacity: .4;
         visibility: visible;
-    `};
+    `}
+
 `;
 
 const OptionsModal = styled.div`  
@@ -42,10 +44,12 @@ const OptionsModal = styled.div`
     margin: 0 auto;
     border-radius: 10px;
     transform: translate(0, -500px);
-    transition: transform .3s .3s linear;
-    ${({ active }) => active && `
+
+    ${({ flag }) => flag && `
         transform: translate(0, 55px);
-    `};
+    `}
+
+    transition: transform .3s .3s linear;
 `;
 
 const CloseOptions = styled.div`  
@@ -58,6 +62,7 @@ const CloseOptions = styled.div`
     opacity: .7;
     border-radius: 50%;
     border: 2px solid black;
+    z-index: 101;
     &:hover {
         span {
             transform: rotate(180deg);
@@ -74,6 +79,17 @@ const Cross = styled.span`
     left: 6px;
     top: 6px;
     transition: transform .25s;
+`;
+
+const OptionsTitle = styled.span`  
+    position: absolute;
+    font-size: 3rem;
+    color: #4f4f4f;
+    display: flex;
+    justify-content: center;
+    text-transform: uppercase;
+    width: 100%;
+    top: 4px;
 `;
 
 const HudOuter = styled.div`
@@ -136,13 +152,17 @@ const ModalButtonCloseImg = styled.img`
 // TODO: Сделать переключение нескольких языков
 // TODO: Поменять дизайн. Сгрупировать все опции в отдельное открывающиеся окно
 
-function Options({ toogleModal }) {
-
-    // const [fullscreen, setFullscreen] = React.useState(true)
-    // const [modalIsOpen, setIsOpen] = React.useState(true)
-    // const [playing, setPlaying] = React.useState(false)
-
+function Options({toogleOptions}) {
+    
     const [modalFlag, setModalFlag] = React.useState(false)
+
+    React.useEffect(() => {
+        if (toogleOptions) {
+            setModalFlag(toogleOptions)
+        }
+    }, [toogleOptions])
+
+    // const [playing, setPlaying] = React.useState(false)
 
     // const [soundFX, setSoundFX] = React.useState((audioLocalState === 'off') ? true : false)
 
@@ -182,12 +202,15 @@ function Options({ toogleModal }) {
     return (
 
         <OptionsWrapper>
-            <OptionsOverlay active={toogleModal === 'closed' || modalFlag ? false : true } />
 
-            <OptionsModal active={toogleModal === 'closed' || modalFlag ? false : true}>
-                    <CloseOptions onClick={setModalFlag(true)}>
+            <OptionsOverlay flag = {modalFlag}/>
+
+            <OptionsModal flag = {modalFlag}>
+                    <CloseOptions onClick={()=>setModalFlag(!modalFlag)}>
                         <Cross/>
                     </CloseOptions>
+                    <OptionsTitle>Options</OptionsTitle>
+                    
             </OptionsModal>
 
         </OptionsWrapper>
@@ -211,8 +234,8 @@ function Options({ toogleModal }) {
     );
 }
 
-// Options.propTypes = {
-//     toogleModal: PropTypes.object,
-// }
+Options.propTypes = {
+    toogleOptions: PropTypes.bool
+}
 
 export default Options;
