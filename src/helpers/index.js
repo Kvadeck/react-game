@@ -1,4 +1,4 @@
-import { sound } from '../constants/index'
+import { soundAssets } from '../constants/index'
 
 import { coffeeButtons } from '../constants/index'
 
@@ -31,7 +31,7 @@ export function getAllElementsWithAttribute(attribute) {
 }
 
 export function coffeeBrewAudio(audioIdx) {
-    audioIdx = new Audio(sound.coffeeBrew);
+    audioIdx = new Audio(soundAssets.coffeeBrew);
     return audioIdx;
 }
 

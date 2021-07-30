@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import React from 'react';
 import { buttonIconSwitcher, getAllElementsWithAttribute, coffeeBrewAudio, stopPlay, buttonStateSwitcher } from '../../helpers/index'
 import Handle from '../../assets/expresso/handle/handle.png';
-import { cups, sound, cupIngredients, cookingState, active, cupsIds, ingCupIds, buttonsIds, timerIds } from '../../constants/index'
+import { cups, soundAssets, cupIngredients, cookingState, active, cupsIds, ingCupIds, buttonsIds, timerIds } from '../../constants/index'
 import Timer from '../Timer/index'
 
 
@@ -131,11 +131,10 @@ function CoffeMaschine({ ingCollection, getRecipe, cups, setCups }) {
 
     let audioLocalState = localStorage.getItem('audio');
 
-    let selectCup = new Audio(sound.selectcup);
-    let coffeeStop = new Audio(sound.coffeeStop);
-    let coffeeStart = new Audio(sound.coffeeStart);
-    let answerCorrect = new Audio(sound.answerCorrect);
-
+    let selectCup = new Audio(soundAssets.selectcup);
+    let coffeeStop = new Audio(soundAssets.coffeeStop);
+    let coffeeStart = new Audio(soundAssets.coffeeStart);
+    let answerCorrect = new Audio(soundAssets.answerCorrect);
 
     React.useEffect(() => {
 

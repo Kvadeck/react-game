@@ -93,7 +93,7 @@ export const IngredientList = [
     { id: 'coffee', src: ingredients['coffee'], width: '50px', top: '41px', height: '39px' },
 ]
 
-export const sound = {
+export const soundAssets = {
     selectcup: '/sound/cupMove.mp3',
     ingredientClick: '/sound/ingredientClick.mp3',
     coffeeStop: '/sound/coffeeStop.mp3',

@@ -6,7 +6,7 @@ import CoffeMaschine from './CoffeMaschine'
 import Recipe from './Recipe'
 import HUD from './HUD'
 import Options from './Options'
-import { sound, maxOrders, storage, cookingState, audioLocalState } from '../constants'
+import { soundAssets, maxOrders, storage, cookingState, audioLocalState } from '../constants'
 import { findIndex } from 'lodash'
 
 const Inner = styled.div`
@@ -26,7 +26,7 @@ const Main = styled.div`
     width: 100%;
 `;
 
-// window.soundManager.setup({ debugMode: false });
+window.soundManager.setup({ debugMode: false });
 
 function App() {
 
@@ -42,7 +42,7 @@ function App() {
 
   const [toogleOptions, setToogleOptions] = React.useState(false)
 
-  const ingredientClick = new Audio(sound.ingredientClick)
+  const ingredientClick = new Audio(soundAssets.ingredientClick)
 
   // !TODO: Отказаться от поиска в dom активных стаканов в функции addIngredientHandle
 

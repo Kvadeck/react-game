@@ -2,18 +2,20 @@
 import React from 'react';
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
-import { sound, recipeEndConfirm, helpText, audioLocalState, modalImg } from '../../constants/index'
+import { soundAssets, recipeEndConfirm, helpText, audioLocalState, modalImg } from '../../constants/index'
 import bgImage from '../../assets/optionsBg.png'
 import CrossImg from '../../assets/cross.png'
+import BackImg from '../../assets/back.png'
+import Sound from 'react-sound'
 
-const OptionsWrapper = styled.div`  
+const Wrapper = styled.div`  
     display: flex;
     width: 100%;
     height: 100%;
     position: absolute;
 `;
 
-const OptionsOverlay = styled.div`  
+const Overlay = styled.div`  
     position: absolute;
     display: flex;
     align-items: center;
@@ -30,12 +32,11 @@ const OptionsOverlay = styled.div`
         opacity: .4;
         visibility: visible;
     `}
-
 `;
 
-const OptionsModal = styled.div`  
-    width: 500px;
-    height: 500px;
+const Modal = styled.div`  
+    width: 390px;
+    height: 380px;
     background: white;
     z-index: 101;
     position: absolute;
@@ -44,18 +45,16 @@ const OptionsModal = styled.div`
     margin: 0 auto;
     border-radius: 10px;
     transform: translate(0, -500px);
-
     ${({ flag }) => flag && `
-        transform: translate(0, 55px);
+        transform: translate(0, 100px);
     `}
-
     transition: transform .3s .3s linear;
 `;
 
-const CloseOptions = styled.div`  
+const CloseWrap = styled.div`  
     position: absolute;
-    top: 5px;
-    right: 6px;
+    top: 8px;
+    right: 7px;
     width: 28px;
     height: 28px;
     cursor: pointer;
@@ -81,7 +80,21 @@ const Cross = styled.span`
     transition: transform .25s;
 `;
 
-const OptionsTitle = styled.span`  
+const BackWrap = styled(CloseWrap)`  
+    left: 7px;
+    display: ${props => props.flag ? 'flex' : 'none'};
+    &:hover {
+        span {
+            transform: rotate(360deg);
+        }
+    }
+`;
+
+const Back = styled(Cross)`  
+    background-image:url(${BackImg});
+`;
+
+const Title = styled.span`  
     position: absolute;
     font-size: 3rem;
     color: #4f4f4f;
@@ -89,148 +102,237 @@ const OptionsTitle = styled.span`
     justify-content: center;
     text-transform: uppercase;
     width: 100%;
-    top: 4px;
+    top: 20px;
 `;
 
-const HudOuter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
+const WrapItem = styled.div`
+    position: relative;
+    width: 100%;
+    top: 6px;
+    flex-direction: column;
+    align-items: center;
+    display: ${props => props.flag ? 'none' : 'flex'};
 `;
-const HudInner = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  background: white;
-  opacity: .4;
-  height: 30px;
-  width: ${({ width }) => width || "100px"};
-  margin: 0 1px;
-  padding: 0 10px;
-  cursor: ${({ cursor }) => cursor || "initial"};
+
+const Item = styled.div`
+    position: relative;
+    display: flex;
+    justify-content: center;
+    text-transform: uppercase;
+    width: fit-content;
+    top: 80px;
+    font-size: 2rem;
+    color: #795548;
+    user-select: none;
+    cursor: pointer;
+    transition: color .2s linear;
+    &:hover {
+        color: #673ab7;
+    }
+    &::before {
+        content: '';
+        position: absolute;
+        display: flex;
+        width: 75px;
+        height: 3px;
+        top: 9px;
+        border-radius: 2px;
+        background-color: #673ab7;
+        transition: visibility .1s linear;
+        visibility: hidden;
+    }
 `;
-const HudText = styled.span`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size: 1.4rem;
+
+const NewGameItem = styled(Item)`
+    top: 80px;
 `;
-const ModalButtonWrapper = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  position: relative;
-  margin-bottom: 10px;
+
+const NewGameText = styled.span`
+    position: relative;
+    display: ${props => props.flag ? 'none' : 'initial'};
 `;
-const ModalButtonClose = styled.a`
-  cursor: pointer;
+
+const ConfirmNewGameWrap = styled.div`
+    position: relative;
+    display: ${props => props.flag ? 'flex' : 'none'};
 `;
-const ModalContentWrapper = styled.div`
-  display: flex;
-  font-family: 'Rotonda Regular', sans-serif;
-  font-size: 1.4rem;
-  margin: 20px;
-  line-height: 1.5;
+
+const ConfirmText = styled.p`
+    position: relative;
+    display: flex;
+    margin: 0 5px;
+    transition: transform .2s linear;
+    &:hover {
+        transform: scale(1.1);
+    }
 `;
-const MaschineImg = styled.img`
-    width: auto;
-    height: auto;
-    margin-bottom: 10px;
-    margin-left: 20px;
+
+const ConfirmTextYes = styled(ConfirmText)`
+    color: green;
 `;
-const ModalButtonCloseImg = styled.img`
-    width: 20px;
-    height: 20px;
+const ConfirmTextNo = styled(ConfirmText)`
+    color: red;
+`;
+
+const FullscreenItem = styled(Item)`
+    top: 100px;
+`;
+
+const FullscreenToogleText = styled.span`
+    color: #673ab7;
+    margin-left: 5px;
+    // Не правильный порядок. Анимация работает не зависимо от изменения в DOM.
+    animation-fill-mode: forwards;
+    animation-duration: ${props => props.flag ? '.6s' : '.5s'};
+    animation-timing-function: ${props => props.flag ? 'cubic-bezier(0.55, 0.085, 0.68, 0.53)' : 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'};
+    animation-name: ${props => props.flag ? 'toogleTextIn' : 'toogleTextOut'};
+`;
+
+const LanguageItem = styled(Item)`
+    top: 120px;
+`;
+
+const MusicItem = styled(Item)`
+    top: 140px;
+    color: ${props => props.flag && "#673ab7"};
+    &::before {
+        visibility: ${props => props.flag && "visible"};
+    }
+`;
+
+const SoundItem = styled(Item)`
+    top: 160px;
+    color: ${props => props.flag && "#673ab7"};
+    &::before {
+        visibility: ${props => props.flag && "visible"};
+    }
+`;
+
+const AboutItem = styled(Item)`
+    top: 180px;
+`;
+
+const LanguageSelectWrap = styled(WrapItem)`
+    display: ${props => props.flag ? 'flex' : 'none'};
+`;
+const EnglishItem = styled(Item)`
+    top: 80px;
+`;
+const RussianItem = styled(Item)`
+    top: 100px;
 `;
 
 // !TODO: Отказаться от библиотек с выпадающим списком и модальным окном
-// TODO: Сделать переключение нескольких языков
-// TODO: Поменять дизайн. Сгрупировать все опции в отдельное открывающиеся окно
+// !TODO: Поменять дизайн. Сгрупировать все опции в отдельное открывающиеся окно
 
-function Options({toogleOptions}) {
-    
+// TODO: Сделать окно с помощью. Разместить там текст и сделать переход
+// TODO: Сделать переключение нескольких языков
+
+function Options({ toogleOptions }) {
+
     const [modalFlag, setModalFlag] = React.useState(false)
+    const [sound, setSound] = React.useState((audioLocalState === 'off') ? true : false)
+    const [music, setMusic] = React.useState(true)
+    const [fullscreen, setFullscreen] = React.useState(false)
+    const [newGame, setNewGame] = React.useState(false)
+    const [language, setLanguage] = React.useState(false)
 
     React.useEffect(() => {
         if (toogleOptions) {
             setModalFlag(toogleOptions)
+            setNewGame(false)
+            setLanguage(false)
         }
     }, [toogleOptions])
 
-    // const [playing, setPlaying] = React.useState(false)
+    function confirmHandle() {
+        return setNewGame(!newGame)
+    }
 
-    // const [soundFX, setSoundFX] = React.useState((audioLocalState === 'off') ? true : false)
+    function newGameHandle() {
+        return location.reload()
+    }
 
-    // function soundFXHandle() {
-    //     localStorage.setItem('audio', (!soundFX) ? 'off' : 'on')
-    //     return setSoundFX(!soundFX)
-    // }
+    function soundHandle() {
+        localStorage.setItem('audio', (!sound) ? 'off' : 'on')
+        return setSound(!sound)
+    }
 
-    // const toggleFullScreenHandle = () => {
-    //     setFullscreen(!fullscreen)
-    //     if (fullscreen) {
-    //         document.documentElement.requestFullscreen();
-    //     } else {
-    //         document.exitFullscreen();
-    //     }
-    // };
-
-    // const dropDownOptions = [
-    //     'New', 'Fullscreen', 'Help'
-    // ];
-
-    // function dropDownHandle(option) {
-    //     let newOption, fullScreenOption, helpOption
-    //     [newOption, fullScreenOption, helpOption] = [...dropDownOptions]
-
-    //     if (option.label === newOption) {
-    //         document.location.reload()
-    //     }
-    //     else if (option.label === fullScreenOption) {
-    //         toggleFullScreenHandle()
-    //     }
-    //     else if (option.label === helpOption) {
-    //         setIsOpen(true)
-    //     }
-    // }
+    function fullScreenHandle() {
+        if (fullscreen) {
+            document.exitFullscreen()
+                .catch((err) => console.error(err))
+        } else {
+            document.documentElement.requestFullscreen();
+        }
+        return setFullscreen(!fullscreen)
+    }
 
     return (
+        <Wrapper>
+            <Sound
+                url={soundAssets.guitarRadioAmbienceLoop}
+                playStatus={(!music) ? Sound.status.PLAYING : Sound.status.STOPPED}
+                loop={true}
+            />
+            <Overlay flag={modalFlag} />
 
-        <OptionsWrapper>
+            <Modal flag={modalFlag}>
+                <CloseWrap onClick={() => setModalFlag(!modalFlag)}>
+                    <Cross />
+                </CloseWrap>
+                <BackWrap flag={language} onClick={() => setLanguage(!language)}>
+                    <Back />
+                </BackWrap>
+                <Title>Options</Title>
+                <WrapItem flag={language}>
 
-            <OptionsOverlay flag = {modalFlag}/>
+                    <NewGameItem>
+                        <NewGameText flag={newGame} onClick={() => confirmHandle()}>New Game</NewGameText>
+                        <ConfirmNewGameWrap flag={newGame}>
+                            <ConfirmTextYes onClick={() => newGameHandle()}>
+                                Yes
+                            </ConfirmTextYes>
+                            <ConfirmTextNo onClick={() => confirmHandle()}>
+                                No
+                            </ConfirmTextNo>
+                        </ConfirmNewGameWrap>
+                    </NewGameItem>
 
-            <OptionsModal flag = {modalFlag}>
-                    <CloseOptions onClick={()=>setModalFlag(!modalFlag)}>
-                        <Cross/>
-                    </CloseOptions>
-                    <OptionsTitle>Options</OptionsTitle>
-                    
-            </OptionsModal>
+                    <FullscreenItem onClick={() => fullScreenHandle()}>
+                        Fullscreen <FullscreenToogleText flag={fullscreen}>{(fullscreen) ? 'off' : 'on'}</FullscreenToogleText>
+                    </FullscreenItem>
 
-        </OptionsWrapper>
+                    <LanguageItem onClick={() => setLanguage(!language)}>
+                        Language
+                    </LanguageItem>
 
-        /* <Sound
-            url={sound.guitarRadioAmbienceLoop}
-            playStatus={(playing) ? Sound.status.PLAYING : Sound.status.STOPPED}
-            loop={true}
-        /> */
+                    <MusicItem flag={music} onClick={() => setMusic(!music)}>
+                        Music
+                    </MusicItem>
 
-        /* <HudOuter cursor={'pointer'} onClick={() => setPlaying(!playing)}>
-            <HudText>Music</HudText>
-            <HudText>{playing ? 'on' : 'off'}</HudText>
-            </HudOuter> */
+                    <SoundItem flag={sound} onClick={() => soundHandle(!sound)}>
+                        Sound
+                    </SoundItem>
 
-        /* <HudOuter width={'100px'} cursor={'pointer'} onClick={soundFXHandle}>
-            <HudText>Sound</HudText>
-            <HudText>{soundFX ? 'off' : 'on'}</HudText>
-        </HudOuter> */
+                    <AboutItem>
+                        Help
+                    </AboutItem>
+                </WrapItem>
+                <LanguageSelectWrap flag={language}>
 
+                    <EnglishItem>
+                        English
+                    </EnglishItem>
+
+                    <RussianItem flag={music} onClick={() => setMusic(!music)}>
+                        Russian
+                    </RussianItem>
+
+                </LanguageSelectWrap>
+            </Modal>
+
+        </Wrapper>
     );
 }
 

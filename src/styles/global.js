@@ -134,4 +134,29 @@ export const GlobalStyle = createGlobalStyle`
 	}
 }
 
+@keyframes toogleTextIn {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes toogleTextOut {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+
 `
