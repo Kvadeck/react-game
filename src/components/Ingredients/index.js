@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import JarEmpty from '../../assets/ingredients/JarEmpty.png';
 import { IngredientList } from '../../constants/index'
 
-// !TODO: Сделать клик по банке вместо самого ингридиента
+// !TODO: Сделать клик по банке вместо самого ингредиента
 // !TODO: Добавить какой нибудь ховер эффект(при наведение на банку ингредиент передвигается вверх и вниз)
 
 const IngredientsWrapper = styled.div`

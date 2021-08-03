@@ -102,6 +102,24 @@ export const GlobalStyle = createGlobalStyle`
     transition: opacity 500ms ease-in;
   }
 
+  .fade-enter {
+    opacity: 0;
+  }
+
+  .fade-enter-active {
+    opacity: 1;
+    transition: opacity 300ms cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  }
+
+  .fade-exit {
+    opacity: 1;
+  }
+
+  .fade-exit-active {
+    opacity: 0;
+    transition: opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
   @keyframes right {
     0% {
       transform: rotate(0deg);
@@ -133,30 +151,4 @@ export const GlobalStyle = createGlobalStyle`
 		transform: translateY(0);
 	}
 }
-
-@keyframes toogleTextIn {
-	0% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
-	}
-}
-
-@keyframes toogleTextOut {
-	0% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
-	}
-}
-
-
 `

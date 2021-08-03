@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
+import { CSSTransition, SwitchTransition } from "react-transition-group"
 import { soundAssets, recipeEndConfirm, helpText, audioLocalState, modalImg } from '../../constants/index'
 import bgImage from '../../assets/optionsBg.png'
 import CrossImg from '../../assets/cross.png'
@@ -111,7 +112,7 @@ const WrapItem = styled.div`
     top: 6px;
     flex-direction: column;
     align-items: center;
-    display: ${props => props.flag ? 'none' : 'flex'};
+    display: flex;
 `;
 
 const Item = styled.div`
@@ -154,7 +155,7 @@ const NewGameText = styled.span`
 
 const ConfirmNewGameWrap = styled.div`
     position: relative;
-    display: ${props => props.flag ? 'flex' : 'none'};
+    display: flex;
 `;
 
 const ConfirmText = styled.p`
@@ -167,25 +168,23 @@ const ConfirmText = styled.p`
     }
 `;
 
-const ConfirmTextYes = styled(ConfirmText)`
+const ConfirmYes = styled(ConfirmText)`
     color: green;
 `;
-const ConfirmTextNo = styled(ConfirmText)`
+const ConfirmNo = styled(ConfirmText)`
     color: red;
 `;
 
 const FullscreenItem = styled(Item)`
     top: 100px;
 `;
-
+const FullscreenText = styled.span`
+    display: flex;
+`;
 const FullscreenToogleText = styled.span`
+    width: 30px;
     color: #673ab7;
     margin-left: 5px;
-    // Не правильный порядок. Анимация работает не зависимо от изменения в DOM.
-    animation-fill-mode: forwards;
-    animation-duration: ${props => props.flag ? '.6s' : '.5s'};
-    animation-timing-function: ${props => props.flag ? 'cubic-bezier(0.55, 0.085, 0.68, 0.53)' : 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'};
-    animation-name: ${props => props.flag ? 'toogleTextIn' : 'toogleTextOut'};
 `;
 
 const LanguageItem = styled(Item)`
@@ -208,12 +207,12 @@ const SoundItem = styled(Item)`
     }
 `;
 
-const AboutItem = styled(Item)`
+const HelpItem = styled(Item)`
     top: 180px;
 `;
 
 const LanguageSelectWrap = styled(WrapItem)`
-    display: ${props => props.flag ? 'flex' : 'none'};
+    display: flex;
 `;
 const EnglishItem = styled(Item)`
     top: 80px;
@@ -222,11 +221,24 @@ const RussianItem = styled(Item)`
     top: 100px;
 `;
 
+const HelpText = styled.div`
+    display: flex;
+    position: absolute;
+    top: 85px;
+    padding: 0 35px;
+    font-size: 1.5rem;
+    font-family: 'Rotonda Regular', sans-serif;
+    line-height: 1.3;
+`;
+
+
 // !TODO: Отказаться от библиотек с выпадающим списком и модальным окном
 // !TODO: Поменять дизайн. Сгрупировать все опции в отдельное открывающиеся окно
+// !TODO: Доделать анимацию для пункта help
+// !TODO: Сделать окно с помощью. Разместить там текст и сделать переход
 
-// TODO: Сделать окно с помощью. Разместить там текст и сделать переход
 // TODO: Сделать переключение нескольких языков
+// TODO: Выделять актуальный язык на данный момент
 
 function Options({ toogleOptions }) {
 
@@ -236,26 +248,31 @@ function Options({ toogleOptions }) {
     const [fullscreen, setFullscreen] = React.useState(false)
     const [newGame, setNewGame] = React.useState(false)
     const [language, setLanguage] = React.useState(false)
+    const [help, setHelp] = React.useState(false)
+
+    const nodeRef = React.useRef(null)
+    const newGameRef = React.useRef(null)
+    const fullscreenRef = React.useRef(null)
 
     React.useEffect(() => {
         if (toogleOptions) {
             setModalFlag(toogleOptions)
             setNewGame(false)
             setLanguage(false)
+            setHelp(false)
         }
     }, [toogleOptions])
 
-    function confirmHandle() {
-        return setNewGame(!newGame)
-    }
-
-    function newGameHandle() {
-        return location.reload()
-    }
+    const confirmHandle = () => setNewGame(!newGame)
+    const newGameHandle = () => location.reload()
 
     function soundHandle() {
         localStorage.setItem('audio', (!sound) ? 'off' : 'on')
         return setSound(!sound)
+    }
+    function backHandle() {
+        setLanguage(false)
+        setHelp(false)
     }
 
     function fullScreenHandle() {
@@ -281,63 +298,96 @@ function Options({ toogleOptions }) {
                 <CloseWrap onClick={() => setModalFlag(!modalFlag)}>
                     <Cross />
                 </CloseWrap>
-                <BackWrap flag={language} onClick={() => setLanguage(!language)}>
+                <BackWrap flag={language || help} onClick={() => backHandle()}>
                     <Back />
                 </BackWrap>
+                
                 <Title>Options</Title>
-                <WrapItem flag={language}>
 
-                    <NewGameItem>
-                        <NewGameText flag={newGame} onClick={() => confirmHandle()}>New Game</NewGameText>
-                        <ConfirmNewGameWrap flag={newGame}>
-                            <ConfirmTextYes onClick={() => newGameHandle()}>
-                                Yes
-                            </ConfirmTextYes>
-                            <ConfirmTextNo onClick={() => confirmHandle()}>
-                                No
-                            </ConfirmTextNo>
-                        </ConfirmNewGameWrap>
-                    </NewGameItem>
+                <SwitchTransition mode="out-in">
+                    <CSSTransition
+                        classNames="fade"
+                        timeout={300}
+                        key={language || help}
+                        nodeRef={nodeRef}
+                    >
+                        <>
+                            {(!language && !help) &&
+                                <WrapItem ref={nodeRef}>
+                                    <NewGameItem>
+                                        <SwitchTransition mode="out-in">
+                                            <CSSTransition
+                                                classNames="fade"
+                                                timeout={200}
+                                                nodeRef={newGameRef}
+                                                key={newGame}
+                                            >
+                                                {!newGame
+                                                    ? <NewGameText ref={newGameRef} onClick={() => confirmHandle()}>New Game</NewGameText>
+                                                    : <ConfirmNewGameWrap ref={newGameRef}>
+                                                        <ConfirmYes onClick={() => newGameHandle()}>
+                                                            Yes
+                                                        </ConfirmYes>
+                                                        <ConfirmNo onClick={() => confirmHandle()}>
+                                                            No
+                                                        </ConfirmNo>
+                                                    </ConfirmNewGameWrap>}
+                                            </CSSTransition>
+                                        </SwitchTransition>
+                                    </NewGameItem>
 
-                    <FullscreenItem onClick={() => fullScreenHandle()}>
-                        Fullscreen <FullscreenToogleText flag={fullscreen}>{(fullscreen) ? 'off' : 'on'}</FullscreenToogleText>
-                    </FullscreenItem>
+                                    <FullscreenItem onClick={() => fullScreenHandle()}>
+                                        <FullscreenText>Fullscreen</FullscreenText>
+                                        <SwitchTransition mode="out-in">
+                                            <CSSTransition
+                                                classNames="fade"
+                                                nodeRef={fullscreenRef}
+                                                timeout={200}
+                                                key={fullscreen}
+                                            >
+                                                <FullscreenToogleText ref={fullscreenRef}>
+                                                    {fullscreen ? "Off" : "On"}
+                                                </FullscreenToogleText>
+                                            </CSSTransition>
+                                        </SwitchTransition>
+                                    </FullscreenItem>
 
-                    <LanguageItem onClick={() => setLanguage(!language)}>
-                        Language
-                    </LanguageItem>
+                                    <LanguageItem onClick={() => setLanguage(!language)}>
+                                        Language
+                                    </LanguageItem>
 
-                    <MusicItem flag={music} onClick={() => setMusic(!music)}>
-                        Music
-                    </MusicItem>
+                                    <MusicItem flag={music} onClick={() => setMusic(!music)}>
+                                        Music
+                                    </MusicItem>
 
-                    <SoundItem flag={sound} onClick={() => soundHandle(!sound)}>
-                        Sound
-                    </SoundItem>
+                                    <SoundItem flag={sound} onClick={() => soundHandle(!sound)}>
+                                        Sound
+                                    </SoundItem>
 
-                    <AboutItem>
-                        Help
-                    </AboutItem>
-                </WrapItem>
-                <LanguageSelectWrap flag={language}>
+                                    <HelpItem onClick={() => setHelp(!help)}>
+                                        Help
+                                    </HelpItem>
+                                </WrapItem>}
 
-                    <EnglishItem>
-                        English
-                    </EnglishItem>
+                            {language && <LanguageSelectWrap ref={nodeRef}>
+                                    <EnglishItem>English</EnglishItem>
+                                    <RussianItem>Русский</RussianItem>
+                            </LanguageSelectWrap>}
 
-                    <RussianItem flag={music} onClick={() => setMusic(!music)}>
-                        Russian
-                    </RussianItem>
+                            {help && <HelpText ref={nodeRef}>
+                                {helpText}
+                            </HelpText>}
 
-                </LanguageSelectWrap>
+                        </>
+                    </CSSTransition>
+                </SwitchTransition>
             </Modal>
-
-        </Wrapper>
+        </Wrapper >
     );
 }
 
 Options.propTypes = {
-    toogleOptions: PropTypes.bool
+    toogleOptions: PropTypes.any
 }
 
 export default Options;
