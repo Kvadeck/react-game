@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
-import { recipeEndConfirm } from '../../constants/index'
 import Bean from '../../assets/bean.png'
 
 const HudWrapper = styled.div`
@@ -69,44 +68,38 @@ const HudBean = styled.span`
 `;
 
 // !TODO: Добавить ховер эффект у элемента меню в HUD
-// TODO: Стилизовать модальное окно для подтверждения
+// !TODO: Стилизовать модальное окно для подтверждения
 
 function HUD({ recipeCount, score, setToogleOptions }) {
+  return (
+    <>
+      <HudWrapper>
+        <HudMenuInner onClick={setToogleOptions(true)}>
+          <HudMenuText>
+            Menu
+            <HudBean></HudBean>
+          </HudMenuText>
+        </HudMenuInner>
+        <HudOuter>
+          <HudInner>
+            <HudText>Orders</HudText>
+            <HudText>{recipeCount}</HudText>
+          </HudInner>
 
-    React.useEffect(() => {
-        if (!recipeCount) {
-            // confirm(recipeEndConfirm);
-            // document.location.reload();
-        }
-    }, [recipeCount])
-
-    return (
-        <HudWrapper>
-            <HudMenuInner onClick={setToogleOptions(true)}>
-                <HudMenuText>
-                    Menu
-                    <HudBean></HudBean>
-                </HudMenuText>
-            </HudMenuInner>
-            <HudOuter>
-                <HudInner>
-                    <HudText>Orders</HudText>
-                    <HudText>{recipeCount}</HudText>
-                </HudInner>
-
-                <HudInner>
-                    <HudText>Score</HudText>
-                    <HudText>{score}</HudText>
-                </HudInner>
-            </HudOuter>
-        </HudWrapper>
-    );
+          <HudInner>
+            <HudText>Score</HudText>
+            <HudText>{score}</HudText>
+          </HudInner>
+        </HudOuter>
+      </HudWrapper>
+    </>
+  );
 }
 
 HUD.propTypes = {
-    recipeCount: PropTypes.number.isRequired,
-    score: PropTypes.number.isRequired,
-    setToogleOptions: PropTypes.func.isRequired
+  recipeCount: PropTypes.number.isRequired,
+  score: PropTypes.number.isRequired,
+  setToogleOptions: PropTypes.func.isRequired
 }
 
 export default HUD;

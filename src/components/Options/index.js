@@ -2,9 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types'
 import styled from 'styled-components';
-import { CSSTransition, SwitchTransition } from "react-transition-group"
-import { soundAssets, recipeEndConfirm, helpText, audioLocalState, modalImg } from '../../constants/index'
-import bgImage from '../../assets/optionsBg.png'
+import { CSSTransition, SwitchTransition } from 'react-transition-group'
+import { soundAssets, helpText, audioLocalState } from '../../constants/index'
 import CrossImg from '../../assets/cross.png'
 import BackImg from '../../assets/back.png'
 import Sound from 'react-sound'
@@ -15,7 +14,6 @@ const Wrapper = styled.div`
     height: 100%;
     position: absolute;
 `;
-
 const Overlay = styled.div`  
     position: absolute;
     display: flex;
@@ -34,9 +32,8 @@ const Overlay = styled.div`
         visibility: visible;
     `}
 `;
-
 const Modal = styled.div`  
-    width: 390px;
+    width: 380px;
     height: 380px;
     background: white;
     z-index: 101;
@@ -51,7 +48,6 @@ const Modal = styled.div`
     `}
     transition: transform .3s .3s linear;
 `;
-
 const CloseWrap = styled.div`  
     position: absolute;
     top: 8px;
@@ -69,7 +65,6 @@ const CloseWrap = styled.div`
         }
     }
 `;
-
 const Cross = styled.span`  
     position: absolute;
     background-image:url(${CrossImg});
@@ -80,7 +75,6 @@ const Cross = styled.span`
     top: 6px;
     transition: transform .25s;
 `;
-
 const BackWrap = styled(CloseWrap)`  
     left: 7px;
     display: ${props => props.flag ? 'flex' : 'none'};
@@ -90,11 +84,9 @@ const BackWrap = styled(CloseWrap)`
         }
     }
 `;
-
 const Back = styled(Cross)`  
     background-image:url(${BackImg});
 `;
-
 const Title = styled.span`  
     position: absolute;
     font-size: 3rem;
@@ -105,7 +97,6 @@ const Title = styled.span`
     width: 100%;
     top: 20px;
 `;
-
 const WrapItem = styled.div`
     position: relative;
     width: 100%;
@@ -114,7 +105,6 @@ const WrapItem = styled.div`
     align-items: center;
     display: flex;
 `;
-
 const Item = styled.div`
     position: relative;
     display: flex;
@@ -143,21 +133,17 @@ const Item = styled.div`
         visibility: hidden;
     }
 `;
-
 const NewGameItem = styled(Item)`
     top: 80px;
 `;
-
 const NewGameText = styled.span`
     position: relative;
     display: ${props => props.flag ? 'none' : 'initial'};
 `;
-
 const ConfirmNewGameWrap = styled.div`
     position: relative;
     display: flex;
 `;
-
 const ConfirmText = styled.p`
     position: relative;
     display: flex;
@@ -167,14 +153,12 @@ const ConfirmText = styled.p`
         transform: scale(1.1);
     }
 `;
-
 const ConfirmYes = styled(ConfirmText)`
     color: green;
 `;
 const ConfirmNo = styled(ConfirmText)`
     color: red;
 `;
-
 const FullscreenItem = styled(Item)`
     top: 100px;
 `;
@@ -186,11 +170,9 @@ const FullscreenToogleText = styled.span`
     color: #673ab7;
     margin-left: 5px;
 `;
-
 const LanguageItem = styled(Item)`
     top: 120px;
 `;
-
 const MusicItem = styled(Item)`
     top: 140px;
     color: ${props => props.flag && "#673ab7"};
@@ -198,7 +180,6 @@ const MusicItem = styled(Item)`
         visibility: ${props => props.flag && "visible"};
     }
 `;
-
 const SoundItem = styled(Item)`
     top: 160px;
     color: ${props => props.flag && "#673ab7"};
@@ -206,11 +187,9 @@ const SoundItem = styled(Item)`
         visibility: ${props => props.flag && "visible"};
     }
 `;
-
 const HelpItem = styled(Item)`
     top: 180px;
 `;
-
 const LanguageSelectWrap = styled(WrapItem)`
     display: flex;
 `;
@@ -220,7 +199,6 @@ const EnglishItem = styled(Item)`
 const RussianItem = styled(Item)`
     top: 100px;
 `;
-
 const HelpText = styled.div`
     display: flex;
     position: absolute;
@@ -230,7 +208,6 @@ const HelpText = styled.div`
     font-family: 'Rotonda Regular', sans-serif;
     line-height: 1.3;
 `;
-
 
 // !TODO: Отказаться от библиотек с выпадающим списком и модальным окном
 // !TODO: Поменять дизайн. Сгрупировать все опции в отдельное открывающиеся окно
@@ -258,8 +235,7 @@ function Options({ toogleOptions }) {
         if (toogleOptions) {
             setModalFlag(toogleOptions)
             setNewGame(false)
-            setLanguage(false)
-            setHelp(false)
+            backHandle()
         }
     }, [toogleOptions])
 
@@ -270,6 +246,7 @@ function Options({ toogleOptions }) {
         localStorage.setItem('audio', (!sound) ? 'off' : 'on')
         return setSound(!sound)
     }
+
     function backHandle() {
         setLanguage(false)
         setHelp(false)
@@ -301,7 +278,7 @@ function Options({ toogleOptions }) {
                 <BackWrap flag={language || help} onClick={() => backHandle()}>
                     <Back />
                 </BackWrap>
-                
+
                 <Title>Options</Title>
 
                 <SwitchTransition mode="out-in">
@@ -377,7 +354,6 @@ function Options({ toogleOptions }) {
                             {help && <HelpText ref={nodeRef}>
                                 {helpText}
                             </HelpText>}
-
                         </>
                     </CSSTransition>
                 </SwitchTransition>

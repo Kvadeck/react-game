@@ -94,6 +94,8 @@ function Recipe({ recipe, getRecipeCount, scoreAdd, recipeCount }) {
     ])
     );
 
+    const nodeRef = React.useRef(null)
+
     React.useEffect(() => {
         if (recipe.length) {
 
@@ -116,8 +118,9 @@ function Recipe({ recipe, getRecipeCount, scoreAdd, recipeCount }) {
                 key={el.id}
                 timeout={transitionDelay}
                 classNames="recipe-card"
+                nodeRef = {nodeRef}
             >
-                <RecipeCard key={i.toString()}>
+                <RecipeCard ref= {nodeRef} key={i.toString()}>
                     {(el['ingredients']).map((val, j) => {
                         return (
                             <OrderImage

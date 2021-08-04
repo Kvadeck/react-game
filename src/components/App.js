@@ -6,6 +6,7 @@ import CoffeMaschine from './CoffeMaschine'
 import Recipe from './Recipe'
 import HUD from './HUD'
 import Options from './Options'
+import Confirm from './Confirm'
 import { soundAssets, maxOrders, storage, cookingState, audioLocalState } from '../constants'
 import { findIndex } from 'lodash'
 
@@ -52,18 +53,17 @@ function App() {
     const ingredientIdx = (target.id === '') ? target.parentNode.id : target.id
     const isCooking = cookStatus[activeCupIdx]
 
-    // Only two ingredients in one cup
+    // Not add more then two ingredients
     if (ingCollection[activeCupIdx].length > 1) return
     // Add only if status === start
     else if (isCooking === cookingState.ready || isCooking === cookingState.done || isCooking === cookingState.fail) return
 
-    if (audioLocalState !== 'off') {
+    if (localStorage.getItem('audio') !== 'off') {
       ingredientClick.play()
     }
 
     ingCollection[activeCupIdx].push(ingredientIdx)
     return setIngCollection([].concat(ingCollection))
-
   }
 
   function getRecipeHandle(recipe) {
@@ -83,6 +83,7 @@ function App() {
       <Options
         toogleOptions={toogleOptions}
       />
+      <Confirm recipeCount={recipeCount} />
       <Inner>
 
         <HUD
