@@ -28,13 +28,13 @@ export const GlobalStyle = createGlobalStyle`
     --border-ingredients-color: #74312b;
     --background-jar-color: #352822;
     
-    --border-bottom-coffemaschinecupsouter-color: #349199;
-    --border-bottom-coffemaschinecupsinner-color: #50a8b2;
+    --coffemaschinecupsouter: #349199;
+    --border-bottom-coffemaschinecupsinner: #50a8b2;
 
-    --background-coffemaschineouter-color: #08403d;
-    --background-coffemaschinecupsinner-color: #246f75;
+    --coffemaschineouter: #08403d;
+    --coffemaschinecupsinner: #246f75;
 
-    --background-coffemaschinebuttonsinner-color: #073439;
+    --background-coffemaschinebuttonsinner: #073439;
 
     --border-top-recipe-color: #cca09d;
   }

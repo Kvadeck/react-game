@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components';
 import Handle from '../../assets/expresso/handle/handle.png';
 import { buttonIconSwitcher, getAllElementsWithAttribute, coffeeBrewAudio, stopPlay, buttonStateSwitcher } from '../../helpers'
-import { cups, soundAssets, cupIngredients, cookingState, active, cupsIds, ingCupIds, buttonsIds, timerIds } from '../../constants'
+import { soundAssets, cupIngredients, cookingState, active, cupsIds, ingCupIds, buttonsIds, timerIds } from '../../constants'
 import Timer from '../Timer'
 
 
@@ -23,19 +23,19 @@ const CoffeMaschineOuter = styled.div`
     padding: 0 8px;
     min-height: 300px;
     border-radius: 25px 25px 0 0;
-    background-color: var(--background-coffemaschineouter-color);
+    background-color: var(--coffemaschineouter);
 `;
 const CoffeMaschineCupsInner = styled.div`
     display: flex;
     position: relative;
     width: 100%;
     border-radius: 2px 2px 0 0;
-    min-height: 190px;
+    min-height: 200px;
     z-index: 1;
     justify-content: flex-end;
     flex-direction: column;
-    border-bottom: var(--border-bottom-coffemaschinecupsouter-color) 1rem solid;
-    background-color: var(--background-coffemaschinecupsinner-color);
+    border-bottom: var(--coffemaschinecupsouter) 1rem solid;
+    background-color: var(--coffemaschinecupsinner);
 `;
 const CoffeMaschineBorder = styled.div`
     display: flex;
@@ -43,7 +43,7 @@ const CoffeMaschineBorder = styled.div`
     position: relative;
     width: 100%;
     height: 6px;
-    background-color: var(--border-bottom-coffemaschinecupsinner-color);
+    background-color: var(--border-bottom-coffemaschinecupsinner);
 `;
 const CoffeMaschineButtonsInner = styled.div`
     display: flex;
@@ -54,7 +54,7 @@ const CoffeMaschineButtonsInner = styled.div`
     border-radius: 30px 30px 0 0;
     align-items: center;
     min-height: 140px;
-    background-color: var(--background-coffemaschinebuttonsinner-color);
+    background-color: var(--background-coffemaschinebuttonsinner);
 `;
 const CoffeMaschineButton = styled.span`
    display: flex;
@@ -84,9 +84,8 @@ const CupsOuter = styled.div`
    z-index: 2;
 `;
 
-const CupsInner = styled.div`
-   display: flex;
-   justify-content: space-between;
+const CupInner = styled.div`
+    display: flex;
 `;
 
 const CupsItem = styled.div`
@@ -112,6 +111,8 @@ const CupsItem = styled.div`
         border-radius: 3px 3px 0 0;
         box-shadow: 0 2px 0 rgb(233 232 227);
 
+        transition: box-shadow .1s linear;
+
         ${({ selected }) => selected && `
             width: 82px;
             height: 46px;
@@ -123,14 +124,16 @@ const CupsItem = styled.div`
     }
 `;
 const CupsItemCircle = styled.span`
-    display: none;
+    display: block;
     opacity:0;
-    transition: opacity .2s linear;
+    visibility: hidden;
+    transition: opacity .1s linear;
     
     ${({ selected }) => selected && `
-        display: block;
         opacity: 1;
+        visibility: visible;
     `};
+
     width: 65px;
     height: 30px;
     left: -9px;
@@ -140,6 +143,7 @@ const CupsItemCircle = styled.span`
     background-color: #eacdcd;
 
     &::before {
+        content: '';
         border-bottom: 16px solid #fedfe0;
         border-left: 5px solid transparent;
         border-right: 4px solid transparent;
@@ -148,7 +152,6 @@ const CupsItemCircle = styled.span`
         position: absolute;
         left: 31px;
         top: 6.9px;
-        content: '';
         display: block;
         transform: rotate(88deg);
         border-radius: 2px 3px 0 0;
@@ -249,15 +252,19 @@ function CoffeMaschine({ ingCollection, getRecipe, cups, setCups }) {
     }, [ingCollection, ingCupCollection])
 
     function handleClickCup({ target }) {
-        const index = target.dataset.index
+        const cupIdx = (target.id === '') ? target.parentNode.id : target.id
 
-        if (cups[index] !== true && audioLocalState !== 'off') {
+        // TODO: После выключения звука, один раз звук срабатывает.
+        if (audioLocalState !== 'off') {
             selectCup.play()
         }
 
-        const pureCups = new Array(3).fill(false)
-        pureCups[index] = true
-        setCups([].concat(pureCups))
+        if (cups[cupIdx] !== true && cupIdx !== '') {
+            const pureCups = new Array(3).fill(false)
+            pureCups[cupIdx] = true
+            setCups([].concat(pureCups))
+        }
+        return cupIdx
     }
 
     function makeCoffee() {
@@ -380,17 +387,13 @@ function CoffeMaschine({ ingCollection, getRecipe, cups, setCups }) {
     const CupsList = cups.map((el, i) =>
     (
 
-
-        <CupsInner>
+        <CupInner id={i} key={cupsIds[i].id} onClick={(e) => handleClickCup(e)}>
 
             <CupsShadow selected={(el) ? true : false} />
 
             <CupsItem
-                data-index={i}
                 data-cooking={cooking[i]}
-                key={cupsIds[i].id}
                 selected={(el) ? true : false}
-                onClick={(e) => handleClickCup(e)}
             >
 
                 <CupsItemCircle selected={(el) ? true : false} />
@@ -407,11 +410,7 @@ function CoffeMaschine({ ingCollection, getRecipe, cups, setCups }) {
                 </IngredientInner>
 
             </CupsItem>
-        </CupsInner>
-
-
-
-
+        </CupInner>
 
     ))
 
