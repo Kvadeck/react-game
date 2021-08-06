@@ -83,11 +83,9 @@ const CupsOuter = styled.div`
    margin: 0 24px;
    z-index: 2;
 `;
-
 const CupInner = styled.div`
     display: flex;
 `;
-
 const CupsItem = styled.div`
     
     position: relative;
@@ -251,15 +249,22 @@ function CoffeMaschine({ ingCollection, getRecipe, cups, setCups }) {
         setIngCupCollection(ingCollection);
     }, [ingCollection, ingCupCollection])
 
+    // TODO: После выключения звука, один раз звук срабатывает.
     function handleClickCup({ target }) {
         const cupIdx = (target.id === '') ? target.parentNode.id : target.id
+        
+        // Cup circle click statement
+        if(cupIdx === '') return
+        // One ingredient inside a cup statement
+        else if(ingCollection[cupIdx].length) return
 
-        // TODO: После выключения звука, один раз звук срабатывает.
-        if (audioLocalState !== 'off') {
+        // Local storage sound and active cup statement
+        if (audioLocalState !== 'off' && cups[cupIdx] !== true) {
             selectCup.play()
         }
-
-        if (cups[cupIdx] !== true && cupIdx !== '') {
+        
+        // Select active cup
+        if (cups[cupIdx] !== true) {
             const pureCups = new Array(3).fill(false)
             pureCups[cupIdx] = true
             setCups([].concat(pureCups))
@@ -405,7 +410,7 @@ function CoffeMaschine({ ingCollection, getRecipe, cups, setCups }) {
                                 key={ingCupIds[j].id}
                                 src={cupIngredients[val]}
                             />
-                        );
+                        )
                     })}
                 </IngredientInner>
 

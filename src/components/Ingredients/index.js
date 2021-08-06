@@ -38,7 +38,7 @@ const EmptyJar = styled.div`
             animation-play-state: running;    
         }
     }
-    `;
+`;
 const IngredientImage = styled.img`
     position: absolute;
     cursor: pointer;

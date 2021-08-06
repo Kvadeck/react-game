@@ -27,13 +27,14 @@ const Main = styled.div`
     width: 100%;
 `;
 
-window.soundManager.setup({ debugMode: false });
+window.soundManager.setup({ debugMode: false })
 
 function App() {
 
   const [ingCollection, setIngCollection] = React.useState([[], [], []])
-
+  
   const [cups, setCups] = React.useState([true, false, false])
+
   const [cookStatus, setCookStatus] = React.useState(['start', 'start', 'start'])
 
   const [recipe, setRecipe] = React.useState([])
@@ -46,13 +47,14 @@ function App() {
   const ingredientClick = new Audio(soundAssets.ingredientClick)
 
   // !TODO: Отказаться от поиска в dom активных стаканов в функции addIngredientHandle
+  // Если ты пытаешься добавить ингредиент в тот стакан в котором уже что то есть, то тогда он не активен.
 
   function addIngredientHandle({ target }) {
 
     const activeCupIdx = findIndex(cups, (el) => el === true)
     const ingredientIdx = (target.id === '') ? target.parentNode.id : target.id
     const isCooking = cookStatus[activeCupIdx]
-
+    
     // Not add more then two ingredients
     if (ingCollection[activeCupIdx].length > 1) return
     // Add only if status === start
