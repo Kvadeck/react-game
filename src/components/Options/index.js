@@ -112,7 +112,7 @@ const Item = styled.div`
     text-transform: uppercase;
     width: fit-content;
     top: 80px;
-    font-size: 2rem;
+    font-size: 2.5rem;
     color: #795548;
     user-select: none;
     cursor: pointer;

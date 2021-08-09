@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types'
-import styled from 'styled-components';
+import styled from 'styled-components'
+import { fill } from 'lodash'
 import Handle from '../../assets/expresso/handle/handle.png';
 import { buttonIconSwitcher, getAllElementsWithAttribute, coffeeBrewAudio, stopPlay, buttonStateSwitcher } from '../../helpers'
 import { soundAssets, cupIngredients, cookingState, active, cupsIds, ingCupIds, buttonsIds, timerIds } from '../../constants'
@@ -84,15 +85,22 @@ const CupsOuter = styled.div`
    z-index: 2;
 `;
 const CupInner = styled.div`
+    position: relative;
     display: flex;
+    align-items: flex-end;
+    top: 0;
 `;
 const CupsItem = styled.div`
     
     position: relative;
     width: 71px;
-    border-top: 100px solid #F5F5F5;
+    border-top: 79px solid #F5F5F5;
     border-left: 11px solid transparent;
     border-right: 9px solid transparent;
+
+    ${({ ingredient }) => ingredient && `
+        border-top: 125px solid #F5F5F5;
+    `};
 
     ${({ selected }) => selected && `
         border-radius: 10% 10% 37% 41%;
@@ -104,12 +112,15 @@ const CupsItem = styled.div`
         background: #F5F5F5;
         width: 80px;
         height: 10px;
-        bottom: 96px;
+        bottom: 80px;
         left: -15px;
         border-radius: 3px 3px 0 0;
         box-shadow: 0 2px 0 rgb(233 232 227);
-
         transition: box-shadow .1s linear;
+
+        ${({ ingredient }) => ingredient && `
+            bottom: 127px;
+        `};
 
         ${({ selected }) => selected && `
             width: 82px;
@@ -160,36 +171,48 @@ const CupsShadow = styled.div`
     
     position: absolute;
     width: 83px;
-    top: 8px;
     margin-left: -6px;
-    border-top: 96px solid rgb(0 0 0 / 10%);
+    top: calc(100% - 87px);
+    border-radius: 5px;
+    border-top: 91px solid rgb(0 0 0 / 10%);
+
+    ${({ ingredient }) => ingredient && `
+        top: 1px;
+        border-top: 128px solid rgb(0 0 0 / 10%);
+        border-radius: initial;
+    `};
+
     border-left: 11px solid transparent;
     border-right: 9px solid transparent;
-
+    
     ${({ selected }) => selected && `
         border-radius: 10% 10% 37% 41%;
     `};
     
     &::before {
         content: '';
-        width: 91px;
-        height: 19px;
-        bottom: 96px;
-        left: -15px;
-        border-radius: 8px 8px 0 0;
         position: absolute;
+        left: -15px;
+        bottom: 81px;
+        width: 91px;
+        height: 18px;
+        border-radius: 8px 8px 0 0;
         background-color: rgb(0 0 0 / 10%);
+
+        ${({ ingredient }) => ingredient && `
+            bottom: 128px;
+        `};
 
         ${({ selected }) => selected && `
             background-color: transparent;
         `};
-
     }
 `;
 const IngredientInner = styled.div`
     display: flex;
     flex-direction: column;
     position: absolute;
+    bottom: 15px;
     align-items: center;
     justify-content: center;
     cursor: pointer;
@@ -208,7 +231,7 @@ const brewSounds = new Array(3).fill(false);
 // ["sucess", "fail", "fail"] "buttons"
 // ["fail", "sucess", "fail"] "buttons"
 
-function CoffeMaschine({ ingCollection, getRecipe, cups, setCups }) {
+function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups, cupsViewState, setCupsViewState, cupWithIngredient }) {
 
     const [buttons, setButtons] = React.useState(['disabled', 'disabled', 'disabled'])
     const [timer, setTimer] = React.useState(['none', 'none', 'none'])
@@ -250,25 +273,29 @@ function CoffeMaschine({ ingCollection, getRecipe, cups, setCups }) {
     }, [ingCollection, ingCupCollection])
 
     // TODO: После выключения звука, один раз звук срабатывает.
-    function handleClickCup({ target }) {
+    function clickCupHandle({ target }) {
         const cupIdx = (target.id === '') ? target.parentNode.id : target.id
-        
-        // Cup circle click statement
-        if(cupIdx === '') return
-        // One ingredient inside a cup statement
-        else if(ingCollection[cupIdx].length) return
 
-        // Local storage sound and active cup statement
-        if (audioLocalState !== 'off' && cups[cupIdx] !== true) {
+        // Cup circle click
+        if (cupIdx === '') return
+
+        // One ingredient inside a cup
+        else if (ingCollection[cupIdx].length) return
+
+        // Local storage sound and active cup
+        if (audioLocalState !== 'off' && selectedCups[cupIdx] !== true) {
             selectCup.play()
         }
-        
-        // Select active cup
-        if (cups[cupIdx] !== true) {
-            const pureCups = new Array(3).fill(false)
-            pureCups[cupIdx] = true
-            setCups([].concat(pureCups))
-        }
+
+        // Reset to false and change to active
+        const pureSelectedCups = fill(selectedCups, false)
+        pureSelectedCups[cupIdx] = true
+        setSelectedCups([].concat(pureSelectedCups))
+
+        const pureCupsViewState = fill(cupsViewState, false)
+        pureCupsViewState[cupIdx] = true
+        setCupsViewState([].concat(pureCupsViewState))
+
         return cupIdx
     }
 
@@ -389,16 +416,16 @@ function CoffeMaschine({ ingCollection, getRecipe, cups, setCups }) {
         resetCup(cupIdx);
     }
 
-    const CupsList = cups.map((el, i) =>
+    const CupsList = cupsViewState.map((el, i) =>
     (
+        <CupInner id={i} key={cupsIds[i].id} onClick={(e) => clickCupHandle(e)}>
 
-        <CupInner id={i} key={cupsIds[i].id} onClick={(e) => handleClickCup(e)}>
-
-            <CupsShadow selected={(el) ? true : false} />
+            <CupsShadow ingredient={(cupWithIngredient[i]) ? true : false} selected={(el) ? true : false} />
 
             <CupsItem
                 data-cooking={cooking[i]}
                 selected={(el) ? true : false}
+                ingredient={(cupWithIngredient[i]) ? true : false}
             >
 
                 <CupsItemCircle selected={(el) ? true : false} />
