@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { fill } from 'lodash'
 import Handle from '../../assets/expresso/handle/handle.png';
-import { buttonIconSwitcher, getAllElementsWithAttribute, coffeeBrewAudio, stopPlay, buttonStateSwitcher } from '../../helpers'
+import { buttonIconSwitcher, getAllElementsWithAttribute, stopPlay, buttonStateSwitcher } from '../../helpers'
 import { soundAssets, cupIngredients, cookingState, active, cupsIds, ingCupIds, buttonsIds, timerIds } from '../../constants'
 import Timer from '../Timer'
-
+import { newCupSelect } from '../../helpers'
+import Sound from 'react-sound'
 
 const CoffeMaschineWrapper = styled.div`
     display: flex;
@@ -222,8 +222,78 @@ const IngredientCup = styled.img`
     width: 50px;
     height: 50px;
 `;
+const Trash = styled.span`
+	position: absolute;
+    display: inline-block;
+    width: 34px;
+    height: 42px;
+    margin: 0 auto;
+    background: #ff5722;
+    left: 18px;
+    opacity: 0;
+    bottom: 23px;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+`;
+const TrashCap = styled.span`
+	position: absolute;
+    height: 7px;
+    background: #ff5722;
+    top: -9px;
+    left: -4px;
+    right: -4px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    transform: rotate(0deg);
+    transition: transform 250ms;
+    transform-origin: 19% 100%;
 
-const brewSounds = new Array(3).fill(false);
+    &::after {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 5px;
+        background: #ff5722;
+        top: -6px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        transform: rotate(0deg);
+        transition: transform 250ms;
+        transform-origin: 19% 100%;
+        left: 14px;
+    }
+`;
+const TrashBody = styled.span`
+	
+    position: relative;
+    width: 3px;
+    height: 23px;
+    background: #fff;
+    display: block;
+    margin: 9px auto;
+    border-radius: 5px;
+
+    &::before {
+        content: '';
+        width: 3px;
+        height: 23px;
+        background: #fff;
+        position: absolute;
+        right: -9px;
+        border-radius: 5px;
+    }
+
+    &::after {
+        content: '';
+        width: 3px;
+        height: 23px;
+        background: #fff;
+        position: absolute;
+        left: -9px;
+        border-radius: 5px;
+    }
+
+`;
 
 // TODO: Баг. Кнопка меняется на sucess, хотя в cooking стоит fail.     
 // Происходит при переключении по таймеру на fail.
@@ -231,13 +301,15 @@ const brewSounds = new Array(3).fill(false);
 // ["sucess", "fail", "fail"] "buttons"
 // ["fail", "sucess", "fail"] "buttons"
 
-function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups, cupsViewState, setCupsViewState, cupWithIngredient }) {
+function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups, cupsViewState, setCupsViewState, cupWithIngredient, setCupWithIngredient }) {
 
     const [buttons, setButtons] = React.useState(['disabled', 'disabled', 'disabled'])
     const [timer, setTimer] = React.useState(['none', 'none', 'none'])
     const [scoreClick, setScoreClick] = React.useState([false, false, false])
     const [cooking, setCooking] = React.useState(['start', 'start', 'start'])
     const [ingCupCollection, setIngCupCollection] = React.useState([[], [], []])
+    
+    const [brewSounds, setBrewSounds] = React.useState([false, false, false])
 
     const [timeout, setTimeout] = React.useState([false, false, false])
 
@@ -288,13 +360,8 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
         }
 
         // Reset to false and change to active
-        const pureSelectedCups = fill(selectedCups, false)
-        pureSelectedCups[cupIdx] = true
-        setSelectedCups([].concat(pureSelectedCups))
-
-        const pureCupsViewState = fill(cupsViewState, false)
-        pureCupsViewState[cupIdx] = true
-        setCupsViewState([].concat(pureCupsViewState))
+        setSelectedCups([].concat(newCupSelect(cupIdx, selectedCups)))
+        setCupsViewState([].concat(newCupSelect(cupIdx, cupsViewState)))
 
         return cupIdx
     }
@@ -305,15 +372,10 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
 
             buttons[buttonIdx] = 'sucess';
 
-            const audioBrew = coffeeBrewAudio(buttonIdx);
-            brewSounds[buttonIdx] = audioBrew;
-
-            if (audioLocalState === 'off') {
-                stopPlay(coffeeStart)
-                stopPlay(audioBrew)
-            } else {
-                coffeeStart.play();
-                audioBrew.play();
+            if (localStorage.getItem('audio') !== 'off') {
+                brewSounds[buttonIdx] = true
+                setBrewSounds([].concat(brewSounds))
+                coffeeStart.play(); 
             }
 
             cooking[buttonIdx] = 'ready';
@@ -378,42 +440,42 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
 
     function resetCup(idx) {
 
-        const cleared = [...ingCupCollection.slice(0, idx), ...ingCupCollection.slice(idx + 1)]
-        console.log(cleared);
-
-        ingCupCollection[idx] = [];
+        ingCupCollection[idx] = []
         setIngCupCollection([].concat(ingCupCollection))
 
-        cooking[idx] = 'start';
+        setSelectedCups([].concat(newCupSelect(idx, selectedCups)))
+        setCupsViewState([].concat(newCupSelect(idx, cupsViewState)))
+        setCupWithIngredient([].concat(newCupSelect(idx, cupWithIngredient, false)))
+
+        cooking[idx] = 'start'
         setCooking([].concat(cooking))
 
-        buttons[idx] = 'disabled';
-        setButtons([].concat(buttons));
+        buttons[idx] = 'disabled'
+        setButtons([].concat(buttons))
 
         timer[idx] = 'none';
-        setTimer([].concat(timer));
+        setTimer([].concat(timer))
 
-        window.clearTimeout(timeout[idx]);
+        window.clearTimeout(timeout[idx])
         timeout[idx] = false
         setTimeout([].concat(timeout))
     }
 
     function removeCupIngredients(e) {
-        e.stopPropagation();
+        e.stopPropagation()
 
-        if (audioLocalState === 'off') {
-            stopPlay(coffeeStop)
-        } else {
+        if (localStorage.getItem('audio') !== 'off') {
             coffeeStop.play()
         }
 
-        const cupIdx = e.currentTarget.parentNode.dataset.index;
+        const cupItem = e.currentTarget.parentNode
+        const cupWrap = cupItem.parentNode
 
-        if (brewSounds[cupIdx]) {
-            stopPlay(brewSounds[cupIdx]);
-            brewSounds[cupIdx] = false;
-        }
-        resetCup(cupIdx);
+        // Stop coffee brew sound when remove ingredient
+        brewSounds[cupWrap.id] = false
+        setBrewSounds([].concat(brewSounds))
+
+        resetCup(cupWrap.id)
     }
 
     const CupsList = cupsViewState.map((el, i) =>
@@ -427,7 +489,10 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
                 selected={(el) ? true : false}
                 ingredient={(cupWithIngredient[i]) ? true : false}
             >
-
+            <Sound
+                url={soundAssets.coffeeBrew}
+                playStatus={(brewSounds[i]) ? Sound.status.PLAYING : Sound.status.STOPPED}
+            />
                 <CupsItemCircle selected={(el) ? true : false} />
 
                 <IngredientInner onClick={(e) => removeCupIngredients(e)}>
@@ -442,6 +507,12 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
                 </IngredientInner>
 
             </CupsItem>
+
+            <Trash>
+                <TrashCap/>
+                <TrashBody/>
+            </Trash>
+
         </CupInner>
 
     ))

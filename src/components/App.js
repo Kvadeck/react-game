@@ -8,6 +8,7 @@ import HUD from './HUD'
 import Options from './Options'
 import Confirm from './Confirm'
 import { soundAssets, maxOrders, storage, cookingState, audioLocalState } from '../constants'
+import { newCupSelect } from '../helpers'
 import { findIndex } from 'lodash'
 
 const Inner = styled.div`
@@ -33,8 +34,6 @@ function App() {
 
   const [ingCollection, setIngCollection] = React.useState([[], [], []])
 
-  // const [cups, setCups] = React.useState([true, false, false])
-
   const [selectedCups, setSelectedCups] = React.useState([true, false, false])
   const [cupsViewState, setCupsViewState] = React.useState([true, false, false])
   const [cupWithIngredient, setCupWithIngredient] = React.useState([false, false, false])
@@ -51,7 +50,6 @@ function App() {
   const ingredientClick = new Audio(soundAssets.ingredientClick)
 
   // !TODO: Отказаться от поиска в dom активных стаканов в функции addIngredientHandle
-  // Если ты пытаешься добавить ингредиент в тот стакан в котором уже что то есть, то тогда он не активен.
 
   function addIngredientHandle({ target }) {
 
@@ -61,20 +59,30 @@ function App() {
 
     // Not add more then two ingredients
     if (ingCollection[activeCupIdx].length > 1) return
-    
+
     // Add only if status === start
     else if (isCooking === cookingState.ready || isCooking === cookingState.done || isCooking === cookingState.fail) return
-    
+
     // Change cup heigth with ingredient
     else if (ingCollection[activeCupIdx].length === 1) {
+
       cupWithIngredient[activeCupIdx] = true
       setCupWithIngredient([].concat(cupWithIngredient))
+
+      // Next cup selection 
+      const nextCupIdx = findIndex(ingCollection, (arr) => arr.length === 0)
+
+      if (nextCupIdx !== -1) {
+        setSelectedCups([].concat(newCupSelect(nextCupIdx, selectedCups)))
+        setCupsViewState([].concat(newCupSelect(nextCupIdx, cupsViewState)))
+      }
     }
 
     if (localStorage.getItem('audio') !== 'off') {
       ingredientClick.play()
     }
 
+    // Reset cup state
     cupsViewState[activeCupIdx] = false
     setCupsViewState([].concat(cupsViewState))
 
@@ -123,7 +131,8 @@ function App() {
           setCupsViewState={setCupsViewState}
 
           cupWithIngredient={cupWithIngredient}
-
+          setCupWithIngredient={setCupWithIngredient}
+          
           getRecipe={getRecipeHandle}
           ingCollection={ingCollection}
         />

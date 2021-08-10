@@ -1,4 +1,5 @@
 import { soundAssets } from '../constants/index'
+import { fill } from 'lodash'
 
 import { coffeeButtons } from '../constants/index'
 
@@ -30,11 +31,6 @@ export function getAllElementsWithAttribute(attribute) {
     return matchingElements;
 }
 
-export function coffeeBrewAudio(audioIdx) {
-    audioIdx = new Audio(soundAssets.coffeeBrew);
-    return audioIdx;
-}
-
 export function stopPlay(audio) {
     audio.pause();
     audio.currentTime = 0.0;
@@ -58,4 +54,10 @@ export function buttonStateSwitcher(dataset) {
 
 export function shuffle(arr) {
     return arr.sort( () => Math.random() - 0.5);
+}
+
+export function newCupSelect(index, arr, flag = true) {
+    const pureCups = fill(arr, false)
+    pureCups[index] = flag
+    return pureCups
 }
