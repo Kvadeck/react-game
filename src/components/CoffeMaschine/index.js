@@ -457,7 +457,7 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
         setCupsViewState([].concat(newCupSelect(idx, cupsViewState)))
         setRecycle([].concat(newCupSelect(idx, recycle)))
 
-        // Reset one cup with ingredient
+        // Reset one cup with ingredient when two ingredients
         cupWithIngredient[idx] = false
         setCupWithIngredient([].concat(cupWithIngredient))
 
