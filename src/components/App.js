@@ -7,7 +7,7 @@ import Recipe from './Recipe'
 import HUD from './HUD'
 import Options from './Options'
 import Confirm from './Confirm'
-import { soundAssets, maxOrders, storage, cookingState, audioLocalState } from '../constants'
+import { soundAssets, maxOrders, cookingState } from '../constants'
 import { newCupSelect } from '../helpers'
 import { findIndex } from 'lodash'
 
@@ -37,6 +37,8 @@ function App() {
   const [selectedCups, setSelectedCups] = React.useState([true, false, false])
   const [cupsViewState, setCupsViewState] = React.useState([true, false, false])
   const [cupWithIngredient, setCupWithIngredient] = React.useState([false, false, false])
+
+  const [recycle, setRecycle ] = React.useState([false, false, false])
 
   const [cookStatus, setCookStatus] = React.useState(['start', 'start', 'start'])
 
@@ -85,6 +87,9 @@ function App() {
     // Reset cup state
     cupsViewState[activeCupIdx] = false
     setCupsViewState([].concat(cupsViewState))
+
+    recycle[activeCupIdx] = false
+    setRecycle([].concat(recycle))
 
     ingCollection[activeCupIdx].push(ingredientIdx)
     return setIngCollection([].concat(ingCollection))
@@ -135,6 +140,9 @@ function App() {
           
           getRecipe={getRecipeHandle}
           ingCollection={ingCollection}
+
+          recycle={recycle}
+          setRecycle={setRecycle}
         />
 
         <Ingredients addIngredient={() => addIngredientHandle} />

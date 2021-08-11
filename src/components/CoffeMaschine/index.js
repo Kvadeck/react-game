@@ -230,7 +230,13 @@ const Trash = styled.span`
     margin: 0 auto;
     background: #ff5722;
     left: 18px;
-    opacity: 0;
+    visibility: hidden;
+
+    ${({ flag }) => flag && `
+        animation: hide .2s .2s linear forwards;
+        visibility: visible;
+    `};
+
     bottom: 23px;
     border-bottom-right-radius: 6px;
     border-bottom-left-radius: 6px;
@@ -244,9 +250,12 @@ const TrashCap = styled.span`
     right: -4px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    transform: rotate(0deg);
-    transition: transform 250ms;
-    transform-origin: 19% 100%;
+    transform-origin: 90% 100%;
+    transform: rotate(40deg);
+
+    ${({ flag }) => flag && `
+        animation: closeCup .2s ease-out forwards;
+    `};
 
     &::after {
         content: '';
@@ -301,7 +310,7 @@ const TrashBody = styled.span`
 // ["sucess", "fail", "fail"] "buttons"
 // ["fail", "sucess", "fail"] "buttons"
 
-function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups, cupsViewState, setCupsViewState, cupWithIngredient, setCupWithIngredient }) {
+function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups, cupsViewState, setCupsViewState, cupWithIngredient, setCupWithIngredient, recycle, setRecycle }) {
 
     const [buttons, setButtons] = React.useState(['disabled', 'disabled', 'disabled'])
     const [timer, setTimer] = React.useState(['none', 'none', 'none'])
@@ -443,9 +452,14 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
         ingCupCollection[idx] = []
         setIngCupCollection([].concat(ingCupCollection))
 
+        // Fill all cups with false and select active cup
         setSelectedCups([].concat(newCupSelect(idx, selectedCups)))
         setCupsViewState([].concat(newCupSelect(idx, cupsViewState)))
-        setCupWithIngredient([].concat(newCupSelect(idx, cupWithIngredient, false)))
+        setRecycle([].concat(newCupSelect(idx, recycle)))
+
+        // Reset one cup with ingredient
+        cupWithIngredient[idx] = false
+        setCupWithIngredient([].concat(cupWithIngredient))
 
         cooking[idx] = 'start'
         setCooking([].concat(cooking))
@@ -482,18 +496,18 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
     (
         <CupInner id={i} key={cupsIds[i].id} onClick={(e) => clickCupHandle(e)}>
 
-            <CupsShadow ingredient={(cupWithIngredient[i]) ? true : false} selected={(el) ? true : false} />
+            <CupsShadow ingredient={cupWithIngredient[i]} selected={el} />
 
             <CupsItem
                 data-cooking={cooking[i]}
-                selected={(el) ? true : false}
-                ingredient={(cupWithIngredient[i]) ? true : false}
+                selected={el}
+                ingredient={cupWithIngredient[i]}
             >
             <Sound
                 url={soundAssets.coffeeBrew}
                 playStatus={(brewSounds[i]) ? Sound.status.PLAYING : Sound.status.STOPPED}
             />
-                <CupsItemCircle selected={(el) ? true : false} />
+                <CupsItemCircle selected={el} />
 
                 <IngredientInner onClick={(e) => removeCupIngredients(e)}>
                     {ingCupCollection[i].map((val, j) => {
@@ -505,14 +519,12 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
                         )
                     })}
                 </IngredientInner>
-
             </CupsItem>
 
-            <Trash>
-                <TrashCap/>
+            <Trash flag={recycle[i]}>
+                <TrashCap flag={recycle[i]}/>
                 <TrashBody/>
             </Trash>
-
         </CupInner>
 
     ))
@@ -557,8 +569,7 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
 
             </CoffeMaschineOuter>
         </CoffeMaschineWrapper>
-
-    );
+    )
 }
 
 CoffeMaschine.propTypes = {

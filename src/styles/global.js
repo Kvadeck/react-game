@@ -151,4 +151,24 @@ export const GlobalStyle = createGlobalStyle`
 		transform: translateY(0);
 	}
 }
+
+@keyframes closeCup {
+    0% {
+      transform: rotate(40deg);
+    }
+    100% {
+      transform: rotate(0);
+    }
+  }
+@keyframes hide {
+    0% {
+      opacity: 1
+    }
+    100% {
+      opacity: 0
+    }
+  }
+
+
+
 `
