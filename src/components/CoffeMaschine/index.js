@@ -65,7 +65,8 @@ const CoffeMaschineButton = styled.span`
    height: 100px;
    margin: 0 9px;
    cursor: pointer;
-   &:after {
+
+   &::after {
        content: '';
        background-image: url(${Handle});
        width: 50px;
@@ -76,6 +77,58 @@ const CoffeMaschineButton = styled.span`
        bottom: -30px;
        margin-left: 25px;
    }
+
+`;
+const CoffeeJet = styled.div`
+    width: 5px;
+    height: 154px;
+    max-height: 0;
+    position: absolute;
+    display: block;
+    top: -155px;
+    z-index: 4;
+    margin-left: 22px;
+    background-color: #4e1315;
+    opacity: 0;
+
+    ${({ flow }) => flow && `
+        animation: flow .4s ease-in forwards;
+    `};
+    
+`;
+const CoffeeGrounds = styled.div`
+
+    position: absolute;
+    width: 64px;
+    left: 3px;
+    border-top: 82px solid #4e1315;
+    border-left: 13px solid transparent;
+    border-right: 11px solid transparent;
+    bottom: 8px;
+
+    ${({ ingredient }) => ingredient && `
+        border-top: 128px solid #4e1315;
+    `};
+`;
+const GlassMeasure = styled.span`
+    width: 15px;
+    height: 4px;
+    position: absolute;
+    display: block;
+    top: 5px;
+    z-index: 4;
+    margin-left: 2px;
+    background-color: #d1b5b4;
+    opacity: 0;
+
+    ${({ ingredient }) => ingredient && `
+        top: 6px;
+        margin-left: 1px;
+    `};
+
+    ${({ flow }) => flow && `
+        opacity: 1;
+    `};
 `;
 const CupsOuter = styled.div`
    position: relative;
@@ -119,7 +172,7 @@ const CupsItem = styled.div`
         transition: box-shadow .1s linear;
 
         ${({ ingredient }) => ingredient && `
-            bottom: 127px;
+            bottom: 126px;
         `};
 
         ${({ selected }) => selected && `
@@ -310,14 +363,14 @@ const TrashBody = styled.span`
 // ["sucess", "fail", "fail"] "buttons"
 // ["fail", "sucess", "fail"] "buttons"
 
-function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups, cupsViewState, setCupsViewState, cupWithIngredient, setCupWithIngredient, recycle, setRecycle }) {
+function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups, cupsViewState, setCupsViewState, cupWithIngredient, setCupWithIngredient, recycle, setRecycle, flowJet, setFlowJet }) {
 
     const [buttons, setButtons] = React.useState(['disabled', 'disabled', 'disabled'])
     const [timer, setTimer] = React.useState(['none', 'none', 'none'])
     const [scoreClick, setScoreClick] = React.useState([false, false, false])
     const [cooking, setCooking] = React.useState(['start', 'start', 'start'])
     const [ingCupCollection, setIngCupCollection] = React.useState([[], [], []])
-    
+
     const [brewSounds, setBrewSounds] = React.useState([false, false, false])
 
     const [timeout, setTimeout] = React.useState([false, false, false])
@@ -375,29 +428,29 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
         return cupIdx
     }
 
-    function makeCoffee() {
-        return function ({ target }) {
-            const buttonIdx = target.dataset.index;
+    function makeCoffee({ target }) {
+        const buttonIdx = target.dataset.index
 
-            buttons[buttonIdx] = 'sucess';
+        buttons[buttonIdx] = 'sucess'
 
-            if (localStorage.getItem('audio') !== 'off') {
-                brewSounds[buttonIdx] = true
-                setBrewSounds([].concat(brewSounds))
-                coffeeStart.play(); 
-            }
-
-            cooking[buttonIdx] = 'ready';
-            setCooking([].concat(cooking))
-
-            timer[buttonIdx] = 'block'
-            scoreClick[buttonIdx] = true;
-
-            setScoreClick([].concat(scoreClick));
-            setButtons([].concat(buttons))
-            setTimer([].concat(timer));
+        if (localStorage.getItem('audio') !== 'off') {
+            brewSounds[buttonIdx] = true
+            setBrewSounds([].concat(brewSounds))
+            coffeeStart.play()
         }
 
+        cooking[buttonIdx] = 'ready'
+        setCooking([].concat(cooking))
+
+        timer[buttonIdx] = 'block'
+        scoreClick[buttonIdx] = true
+
+        flowJet[buttonIdx] = true
+        setFlowJet([].concat(flowJet))
+
+        setScoreClick([].concat(scoreClick))
+        setButtons([].concat(buttons))
+        setTimer([].concat(timer))
     }
 
     function scoreHandle(e) {
@@ -461,6 +514,10 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
         cupWithIngredient[idx] = false
         setCupWithIngredient([].concat(cupWithIngredient))
 
+        // Reset cup flow
+        flowJet[idx] = false
+        setFlowJet([].concat(flowJet))
+
         cooking[idx] = 'start'
         setCooking([].concat(cooking))
 
@@ -494,25 +551,30 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
 
     const CupsList = cupsViewState.map((el, i) =>
     (
-        <CupInner id={i} key={cupsIds[i].id} onClick={(e) => clickCupHandle(e)}>
+        <CupInner data-component='CupInner' id={i} key={cupsIds[i].id} onClick={(e) => clickCupHandle(e)}>
 
-            <CupsShadow ingredient={cupWithIngredient[i]} selected={el} />
+            <CupsShadow data-component='CupsShadow' ingredient={cupWithIngredient[i]} selected={el} />
 
             <CupsItem
                 data-cooking={cooking[i]}
+                data-component='CupsItem'
                 selected={el}
                 ingredient={cupWithIngredient[i]}
             >
-            <Sound
-                url={soundAssets.coffeeBrew}
-                playStatus={(brewSounds[i]) ? Sound.status.PLAYING : Sound.status.STOPPED}
-            />
-                <CupsItemCircle selected={el} />
+                <Sound
+                    url={soundAssets.coffeeBrew}
+                    playStatus={(brewSounds[i]) ? Sound.status.PLAYING : Sound.status.STOPPED}
+                />
+                <CupsItemCircle data-component='CupsItemCircle' selected={el} />
 
-                <IngredientInner onClick={(e) => removeCupIngredients(e)}>
+
+                <CoffeeJet flow={flowJet[i]} data-component='CoffeeJet' />
+
+                <IngredientInner data-component='IngredientInner' onClick={(e) => removeCupIngredients(e)}>
                     {ingCupCollection[i].map((val, j) => {
                         return (
                             <IngredientCup
+                                data-component='IngredientCup'
                                 key={ingCupIds[j].id}
                                 src={cupIngredients[val]}
                             />
@@ -521,33 +583,34 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
                 </IngredientInner>
             </CupsItem>
 
-            <Trash flag={recycle[i]}>
-                <TrashCap flag={recycle[i]}/>
-                <TrashBody/>
+            <CoffeeGrounds ingredient={cupWithIngredient[i]} data-component='CoffeeGrounds' />
+            <GlassMeasure ingredient={cupWithIngredient[i]} flow={flowJet[i]} data-component='GlassMeasure' />
+
+            <Trash flag={recycle[i]} data-component='Trash'>
+                <TrashCap data-component='TrashCap' flag={recycle[i]} />
+                <TrashBody data-component='TrashBody' />
             </Trash>
         </CupInner>
-
     ))
 
     const ButtonsList = buttons.map((el, i) => (
 
         <CoffeMaschineButton
             data-index={i}
-            onClick={(el === 'start') ? makeCoffee() : () => ''}
+            data-component='CoffeMaschineButton'
+            onClick={(el === 'start') ? (e) => makeCoffee(e) : () => { return }}
             key={buttonsIds[i].id}
             buttonIcon={buttonIconSwitcher(el)}
         >
-
             <Timer
                 index={i}
-                key={timerIds[i].id}
                 fail={failCupHandle}
+                data-component='Timer'
                 animation={scoreClick[i]}
                 score={(scoreClick[i]) ? () => scoreHandle : () => () => ''}
                 show={timer[i]}
                 timeout={timeout}
             />
-
         </CoffeMaschineButton>
     ))
 

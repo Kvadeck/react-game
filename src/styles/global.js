@@ -169,6 +169,15 @@ export const GlobalStyle = createGlobalStyle`
     }
   }
 
+@keyframes flow {
+    0% {
+      max-height: 0
+    }
+    100% {
+      max-height: 154px
+    }
+  }
+
 
 
 `

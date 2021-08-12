@@ -40,6 +40,8 @@ function App() {
 
   const [recycle, setRecycle ] = React.useState([false, false, false])
 
+  const [flowJet, setFlowJet ] = React.useState([false, false, false])
+
   const [cookStatus, setCookStatus] = React.useState(['start', 'start', 'start'])
 
   const [recipe, setRecipe] = React.useState([])
@@ -143,6 +145,9 @@ function App() {
 
           recycle={recycle}
           setRecycle={setRecycle}
+
+          flowJet={flowJet}
+          setFlowJet={setFlowJet}
         />
 
         <Ingredients addIngredient={() => addIngredientHandle} />
