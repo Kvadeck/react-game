@@ -178,6 +178,23 @@ export const GlobalStyle = createGlobalStyle`
     }
   }
 
-
-
+@keyframes fillUpFirst {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(0, -50px);
+    }
+  }
+  
+@keyframes fillUpSecond {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(0, -50px);
+    }
+  }
 `
+
+    

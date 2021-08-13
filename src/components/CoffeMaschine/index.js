@@ -7,6 +7,7 @@ import { soundAssets, cupIngredients, cookingState, active, cupsIds, ingCupIds, 
 import Timer from '../Timer'
 import { newCupSelect } from '../../helpers'
 import Sound from 'react-sound'
+import coffeeGround from '../../assets/coffeeGround.png'
 
 const CoffeMaschineWrapper = styled.div`
     display: flex;
@@ -85,31 +86,77 @@ const CoffeeJet = styled.div`
     max-height: 0;
     position: absolute;
     display: block;
-    top: -155px;
+    top: -162px;
     z-index: 4;
     margin-left: 22px;
     background-color: #4e1315;
     opacity: 0;
 
     ${({ flow }) => flow && `
+        opacity: 1;
         animation: flow .4s ease-in forwards;
     `};
-    
 `;
-const CoffeeGrounds = styled.div`
-
+const CoffeeFilledBrown = styled.div`
     position: absolute;
-    width: 64px;
-    left: 3px;
+    width: 61px;
+    left: 5px;
     border-top: 82px solid #4e1315;
     border-left: 13px solid transparent;
     border-right: 11px solid transparent;
     bottom: 8px;
+    z-index: 3;
+
+    visibility: hidden;
+
+    ${({ flow }) => flow && `
+        visibility: visible;
+    `};
 
     ${({ ingredient }) => ingredient && `
         border-top: 128px solid #4e1315;
     `};
 `;
+const CoffeeFilledBottomInner = styled.div`
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+    left: 10px;
+    top: 21px;
+    position: absolute;
+    z-index: 2;
+`;
+const CoffeeFilledTopInner = styled(CoffeeFilledBottomInner)`
+    left: 5px;
+    top: -11px;
+`;
+const CoffeeBottomSquare = styled.div`
+    position: relative;
+    width: 52px;
+    height: 50px;
+    background-color: whitesmoke;
+    
+    ${({ flow }) => flow && `
+        animation: fillUpFirst 3s .4s linear forwards;
+    `};
+
+    ${({ ingredient }) => ingredient && `
+        // TODO SOMETHING WHEN INGREDIENT
+    `};
+`;
+const CoffeeTopSquare = styled(CoffeeBottomSquare)`
+    width: 61px;
+    height: 36px;
+
+    ${({ flow }) => flow && `
+        animation: fillUpFirst 2s 3.4s linear forwards;
+    `};
+
+    ${({ ingredient }) => ingredient && `
+        // TODO SOMETHING WHEN INGREDIENT
+    `};
+`;
+
 const GlassMeasure = styled.span`
     width: 15px;
     height: 4px;
@@ -170,7 +217,7 @@ const CupsItem = styled.div`
         border-radius: 3px 3px 0 0;
         box-shadow: 0 2px 0 rgb(233 232 227);
         transition: box-shadow .1s linear;
-
+        z-index: 3;
         ${({ ingredient }) => ingredient && `
             bottom: 126px;
         `};
@@ -195,7 +242,8 @@ const CupsItemCircle = styled.span`
         opacity: 1;
         visibility: visible;
     `};
-
+    
+    z-index: 3;
     width: 65px;
     height: 30px;
     left: -9px;
@@ -567,7 +615,6 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
                 />
                 <CupsItemCircle data-component='CupsItemCircle' selected={el} />
 
-
                 <CoffeeJet flow={flowJet[i]} data-component='CoffeeJet' />
 
                 <IngredientInner data-component='IngredientInner' onClick={(e) => removeCupIngredients(e)}>
@@ -583,7 +630,16 @@ function CoffeMaschine({ ingCollection, getRecipe, selectedCups, setSelectedCups
                 </IngredientInner>
             </CupsItem>
 
-            <CoffeeGrounds ingredient={cupWithIngredient[i]} data-component='CoffeeGrounds' />
+                <CoffeeFilledBrown flow={flowJet[i]} ingredient={cupWithIngredient[i]} data-component='CoffeeFilledBrown' />
+
+                <CoffeeFilledBottomInner data-component='CoffeeFilledBottomInner'>
+                    <CoffeeBottomSquare flow={flowJet[i]} ingredient={cupWithIngredient[i]} data-component='CoffeeBottomSquare' />
+                </CoffeeFilledBottomInner>
+
+                <CoffeeFilledTopInner data-component='CoffeeFilledTopInner'>
+                        <CoffeeTopSquare flow={flowJet[i]} data-component='CoffeeTopSquare'/>
+                </CoffeeFilledTopInner>
+
             <GlassMeasure ingredient={cupWithIngredient[i]} flow={flowJet[i]} data-component='GlassMeasure' />
 
             <Trash flag={recycle[i]} data-component='Trash'>
